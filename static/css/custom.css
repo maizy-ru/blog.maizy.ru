@@ -1,0 +1,50 @@
+.footnotes {
+    color: #a3a3a3;
+    font-size: 70%;
+}
+
+body {
+    font-size: 19px;
+}
+
+.summary a {
+    text-decoration: none;
+    border-bottom: 1px dotted;
+}
+
+
+.summary a:hover {
+    text-decoration: none;
+    border-bottom: 1px solid;
+}
+
+.summary img {
+    max-width: 100%;
+    height: auto;
+}
+
+.summary figcaption, .caption {
+    font-size: small;
+    margin-bottom: 2px;
+}
+
+.article-info {
+    font-size: 70%;
+    color: #a3a3a3;
+}
+
+p {
+    line-height: 160%;
+}
+
+@media(min-width: 767px){
+    .article-info {
+        text-align: right;
+    }
+    .published {
+        margin-right: 12px;
+    }
+    .published, .tags {
+        display: inline;
+    }
+}
