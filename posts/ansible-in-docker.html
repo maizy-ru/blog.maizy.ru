@@ -2,7 +2,7 @@
 <html lang="ru"
 >
 <head>
-    <title>Использование ansible в Docker конейнерах - blog.maizy.ru</title>
+    <title>Использование ansible в Docker контейнерах - blog.maizy.ru</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -14,13 +14,13 @@
 
         <meta name="author" content="Никита Ковалев" />
         <meta name="keywords" content="ansible,docker" />
-        <meta name="description" content="TODO" />
+        <meta name="description" content="Для решения задачи настройки сервера уже давно придумали много вещей лучше, чем просто bash скрипт. Я в частности, использую ansible. Но для создания docker контейнеров по прежнему предлагается механизм который не далеко ушёл от bash скриптов. Мне понадобилось строить на сервере набор контейнеров, причём полностью автоматизировано. Если создание docker images на основе Dockerfile и работа с готовыми контейнерами в ansible решается из коробки, то с настройкой контейнеров через ansible пришлось немного извратиться. Идея простая: сделать базовый image в docker в котором через Dockerfile устанавливается только ansible, засинхронизировать с локальной машины на хост машину все файлы, нужные для ansible - роли, настройки и таски, создать контейнер, засинхронизированные настройки подключить в volume внутри контейнера, запустить ansible-playbook через docker exec, готовые контейнеры при необходимости коммитяться и используются как основа для других контейнеров. Плюсы ansible здесь – идемпотентность, готовые модули и возможность использовать некоторые роли, как для хост машин, так и для контейнеров. Например, у меня есть абстрактная роль nginx и отдельная роль поверх неё nginx_container со спецификой для контейнеров. То что получилось и подробности работы можно посмотреть в репозитории scala-moscow/deploy." />
 
         <meta property="og:site_name" content="blog.maizy.ru" />
         <meta property="og:type" content="article"/>
-        <meta property="og:title" content="Использование ansible в Docker конейнерах"/>
+        <meta property="og:title" content="Использование ansible в Docker контейнерах"/>
         <meta property="og:url" content="http://blog.maizy.ru/posts/ansible-in-docker"/>
-        <meta property="og:description" content="TODO"/>
+        <meta property="og:description" content="Для решения задачи настройки сервера уже давно придумали много вещей лучше, чем просто bash скрипт. Я в частности, использую ansible. Но для создания docker контейнеров по прежнему предлагается механизм который не далеко ушёл от bash скриптов. Мне понадобилось строить на сервере набор контейнеров, причём полностью автоматизировано. Если создание docker images на основе Dockerfile и работа с готовыми контейнерами в ansible решается из коробки, то с настройкой контейнеров через ansible пришлось немного извратиться. Идея простая: сделать базовый image в docker в котором через Dockerfile устанавливается только ansible, засинхронизировать с локальной машины на хост машину все файлы, нужные для ansible - роли, настройки и таски, создать контейнер, засинхронизированные настройки подключить в volume внутри контейнера, запустить ansible-playbook через docker exec, готовые контейнеры при необходимости коммитяться и используются как основа для других контейнеров. Плюсы ansible здесь – идемпотентность, готовые модули и возможность использовать некоторые роли, как для хост машин, так и для контейнеров. Например, у меня есть абстрактная роль nginx и отдельная роль поверх неё nginx_container со спецификой для контейнеров. То что получилось и подробности работы можно посмотреть в репозитории scala-moscow/deploy."/>
         <meta property="article:published_time" content="2015-04-02" />
             <meta property="article:section" content="Tech" />
             <meta property="article:tag" content="ansible" />
@@ -85,8 +85,8 @@ blog.maizy.ru            </a>
                 <h1>
                     <a href="http://blog.maizy.ru/posts/ansible-in-docker"
                        rel="bookmark"
-                       title="Permalink to Использование ansible в Docker конейнерах">
-                        Использование ansible в Docker конейнерах
+                       title="Permalink to Использование ansible в Docker контейнерах">
+                        Использование ansible в Docker контейнерах
                     </a>
                 </h1>
                 <div class="article-info">
@@ -107,7 +107,19 @@ blog.maizy.ru            </a>
 </footer><!-- /.post-info -->                </div>
             </header>
             <div class="entry-content">
-                <p>TODO</p>
+                <p>Для решения задачи настройки сервера уже давно придумали много вещей лучше, чем просто bash скрипт. Я в частности, использую <a href="http://docs.ansible.com/index.html">ansible</a>. Но для создания docker контейнеров <a href="https://docs.docker.com/reference/builder/">по прежнему предлагается</a> механизм который не далеко ушёл от bash скриптов.</p>
+<p>Мне понадобилось строить на сервере набор контейнеров, причём полностью автоматизировано. Если создание docker images на основе Dockerfile и работа с готовыми контейнерами в ansible решается из коробки, то с настройкой контейнеров через ansible пришлось немного извратиться.</p>
+<p>Идея простая:</p>
+<ul>
+<li>сделать базовый image в docker в котором через Dockerfile устанавливается только ansible,</li>
+<li>засинхронизировать с локальной машины на хост машину все файлы, нужные для ansible - роли, настройки и таски,</li>
+<li>создать контейнер,</li>
+<li>засинхронизированные настройки подключить в volume внутри контейнера,</li>
+<li>запустить ansible-playbook через docker exec,</li>
+<li>готовые контейнеры при необходимости коммитяться и используются как основа для других контейнеров.</li>
+</ul>
+<p>Плюсы ansible здесь – идемпотентность, готовые модули и возможность использовать некоторые роли, как для хост машин, так и для контейнеров. Например, у меня есть абстрактная роль <code>nginx</code> и отдельная роль поверх неё <code>nginx_container</code> со спецификой для контейнеров.</p>
+<p>То что получилось и подробности работы можно посмотреть в <a href="https://github.com/scala-moscow/deploy">репозитории scala-moscow/deploy</a>.</p>
             </div>
             <!-- /.entry-content -->
     <hr/>
