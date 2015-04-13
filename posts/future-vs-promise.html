@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru"
+>
+<head>
+    <title>Отличие Future от Promise - blog.maizy.ru</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://blog.maizy.ru/posts/future-vs-promise">
+
+        <meta name="author" content="Никита Ковалев" />
+        <meta name="keywords" content="async" />
+        <meta name="description" content="Недавно пытался на пальцах объяснить отличие Future от Promise. Понятия эти очень близкие, даже статья на Wikipedia про них одна. Как правило Future и Promise используются как контейнер, для представления данных, которых пока нет, но уже можно сформировать цепочку их обработки. Реализации, которые мне известны: Deffered в Twisted, Future в python 3, его примитивный backport в tornado и Deffered в jQuery. Мне нравится такое определение разницы: Future – это контейнер, на результат которого вы подписываетесь, но не управляете его появлением. Promise – это контейнер, результат в который вы предоставляете и сами управляете его появлением в будущем. Условно можно считать Future &#34;переменной&#34;, а Promise &#34;функцией по установке переменной&#34;. Логично, что во многих реализациях эти объекты порождаются парами. Иногда даже эти понятия смешивают в один контейнер, который предоставляет реализации обоих задач, например, так сделано в jQuery и python. Но даже, если реализация смешана, полезно каким-либо образом, хотя бы в соглашениях понимать имеете ли вы право &#34;зажечь&#34; контейнер или имеете право только подписываться на него. За Future не нужно следить и можно считать, что код который их вернул обязательно когда-нибудь вызовет ваши callback&#39;и. За Promise же вы ответственны и должны не забыть вызвать его в любом случае, даже если ваш код упал с какой-то ожидаемой или не ожидаемой ошибкой." />
+
+        <meta property="og:site_name" content="blog.maizy.ru" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Отличие Future от Promise"/>
+        <meta property="og:url" content="http://blog.maizy.ru/posts/future-vs-promise"/>
+        <meta property="og:description" content="Недавно пытался на пальцах объяснить отличие Future от Promise. Понятия эти очень близкие, даже статья на Wikipedia про них одна. Как правило Future и Promise используются как контейнер, для представления данных, которых пока нет, но уже можно сформировать цепочку их обработки. Реализации, которые мне известны: Deffered в Twisted, Future в python 3, его примитивный backport в tornado и Deffered в jQuery. Мне нравится такое определение разницы: Future – это контейнер, на результат которого вы подписываетесь, но не управляете его появлением. Promise – это контейнер, результат в который вы предоставляете и сами управляете его появлением в будущем. Условно можно считать Future &#34;переменной&#34;, а Promise &#34;функцией по установке переменной&#34;. Логично, что во многих реализациях эти объекты порождаются парами. Иногда даже эти понятия смешивают в один контейнер, который предоставляет реализации обоих задач, например, так сделано в jQuery и python. Но даже, если реализация смешана, полезно каким-либо образом, хотя бы в соглашениях понимать имеете ли вы право &#34;зажечь&#34; контейнер или имеете право только подписываться на него. За Future не нужно следить и можно считать, что код который их вернул обязательно когда-нибудь вызовет ваши callback&#39;и. За Promise же вы ответственны и должны не забыть вызвать его в любом случае, даже если ваш код упал с какой-то ожидаемой или не ожидаемой ошибкой."/>
+        <meta property="article:published_time" content="2015-04-13" />
+            <meta property="article:section" content="Tech" />
+            <meta property="article:tag" content="async" />
+            <meta property="article:author" content="Никита Ковалев" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
+    <link href="http://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/style.css" type="text/css"/>
+        <link href="http://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
+
+        <link href="http://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
+              title="blog.maizy.ru"/>
+        <link href="http://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
+              title="blog.maizy.ru"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.maizy.ru/" class="navbar-brand">
+blog.maizy.ru            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                        <li >
+                            <a href="http://blog.maizy.ru/life">Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.maizy.ru/">Tech</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
+              <li><a href="http://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
+
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.maizy.ru/posts/future-vs-promise"
+                       rel="bookmark"
+                       title="Permalink to Отличие Future от Promise">
+                        Отличие Future от Promise
+                    </a>
+                </h1>
+                <div class="article-info">
+<footer class="post-info">
+    <div class="published">
+        <time datetime="2015-04-13T00:00:00+03:00"> 13.04.2015</time>
+    </div>
+
+
+
+<div class="tags">
+<i class="fa fa-tags"></i>&nbsp;
+	<a href="http://blog.maizy.ru/tag/async">async</a>
+</div>
+    
+</footer><!-- /.post-info -->                </div>
+            </header>
+            <div class="entry-content">
+                <p>Недавно пытался на пальцах объяснить отличие Future от Promise. Понятия эти очень близкие, даже <a href="http://en.wikipedia.org/wiki/Futures_and_promises">статья на Wikipedia</a> про них одна.</p>
+<p>Как правило Future и Promise используются как контейнер, для представления данных, которых пока нет, но уже можно сформировать цепочку их обработки. Реализации, которые мне известны: <a href="https://twistedmatrix.com/documents/14.0.1/core/howto/defer.html">Deffered в Twisted</a>, <a href="https://docs.python.org/3/library/concurrent.futures.html#future-objects">Future в python 3</a>, его <a href="http://www.tornadoweb.org/en/branch3.2/concurrent.html?highlight=future#tornado.concurrent.Future">примитивный backport в tornado</a> и <a href="https://api.jquery.com/category/deferred-object/">Deffered в jQuery</a>.</p>
+<p>Мне нравится такое определение разницы:</p>
+<p><strong>Future</strong> – это контейнер, на результат которого вы <em>подписываетесь</em>, но не управляете его появлением.</p>
+<p><strong>Promise</strong> – это контейнер, результат в который вы <em>предоставляете</em> и сами управляете его появлением в будущем.</p>
+<p>Условно можно считать Future "переменной", а Promise "функцией по установке переменной". Логично, что во многих реализациях эти объекты порождаются парами. Иногда даже эти понятия смешивают в один контейнер, который предоставляет реализации обоих задач, например, так сделано в jQuery и python. Но даже, если реализация смешана, полезно каким-либо образом, хотя бы в соглашениях понимать имеете ли вы право "зажечь" контейнер или имеете право только подписываться на него.</p>
+<p>За Future не нужно следить и можно считать, что код который их вернул обязательно когда-нибудь вызовет ваши callback'и. За Promise же вы ответственны и должны не забыть вызвать его в любом случае, даже если ваш код упал с какой-то ожидаемой или не ожидаемой ошибкой.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'blogmaizyru'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'future-vs-promise';
+                var disqus_url = 'http://blog.maizy.ru/posts/future-vs-promise';
+
+            var disqus_config = function () {
+                this.language = "ru";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row footnotes">
+         <div class="col-xs-10">&copy; 2015 Никита Ковалев
+            &middot; Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
+            &middot; Theme <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>.         </div>
+      </div>
+   </div>
+</footer>
+<script src="http://blog.maizy.ru/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.maizy.ru/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'blogmaizyru'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-392618-8', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+</body>
+</html>
