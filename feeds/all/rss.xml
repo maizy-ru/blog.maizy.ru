@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>blog.maizy.ru</title><link>http://blog.maizy.ru/</link><description></description><atom:link href="http://blog.maizy.ru.local/feeds/all/rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 20 Jul 2015 00:00:00 +0300</lastBuildDate><item><title>Akka для распределённых приложений - remote vs cluster</title><link>http://blog.maizy.ru/posts/akka-remote-n-cluster</link><description>&lt;p&gt;Буду делать небольшие заметки на полях по результатам изучения akka.&lt;/p&gt;
 &lt;p&gt;Akka – это система акторов на jvm, реализованная на scala. Можно использовать и из java. Про саму концепцию акторов можно почитать в &lt;a href="https://ru.wikipedia.org/wiki/Модель_акторов"&gt;интернетах&lt;/a&gt;, здесь я буду останавливаться на особенностях akka.&lt;/p&gt;
-&lt;h2&gt;Что читать?&lt;/h2&gt;
+&lt;h3&gt;Что читать?&lt;/h3&gt;
 &lt;p&gt;Я пока рекомендую такие источники:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -18,10 +18,11 @@
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Если жалко 40$ то книгу можно не покупать. Благородя Typesafe хайпа в сети по akka хватает. Для фреймворка – это хорошо.&lt;/p&gt;
-&lt;h2&gt;Применимость&lt;/h2&gt;
+&lt;h3&gt;Применимость&lt;/h3&gt;
 &lt;p&gt;Меня akka интересует в основном с точки зрения распределённых систем.
 Akka позволяет работать на одной jvm и даже есть &lt;a href="http://engineering.intenthq.com/2015/06/wikidata-akka-streams/"&gt;успешные кейсы&lt;/a&gt;, когда в такой подход даёт выигрыш в противовес обычным многопоточным потокам.&lt;/p&gt;
 &lt;p&gt;При этом в akka имеет грамотный подход, что реализации работы различных механизмов по сети ставиться во главу угла, а локальная работа рассматривается, как один из способов оптимизации.&lt;/p&gt;
+&lt;h3&gt;remote vs cluster&lt;/h3&gt;
 &lt;p&gt;В akka есть понятие "&lt;a href="http://doc.akka.io/docs/akka/2.3.12/scala/remoting.html"&gt;akka remote&lt;/a&gt;" – это возможность работать с любыми акторами прозрачно, не зная, где именно они находятся - локально или удалённо. Вы должны каким-либо образом знать, как до этих акторов добраться и эта реализация на вашей ответственности.&lt;/p&gt;
 &lt;p&gt;Поверх akka remote строиться &lt;a href="http://doc.akka.io/docs/akka/2.3.12/common/cluster.html"&gt;akka cluster&lt;/a&gt;, который реализует кластерное решение, т.е. количество нод может динамически меняться, каждой ноде может быть назначена роль, которую она исполняет в системе.&lt;/p&gt;
 &lt;p&gt;Ноды договариваются с друг другом по &lt;a href="http://doc.akka.io/docs/akka/2.3.12/common/cluster.html#Gossip"&gt;gosip протоколу&lt;/a&gt; и внутри используют для хранения состояния CRDT структуры. Одна из нод назначается мастером, если она погасла мастером станет автоматически другая нода.&lt;/p&gt;
