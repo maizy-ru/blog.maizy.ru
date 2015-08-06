@@ -74,6 +74,77 @@ blog.maizy.ru            </a>
         <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
 
             <article>
+                <h2><a href="http://blog.maizy.ru/posts/akka-graceful-shutdown">Akka graceful shutdown и обработка системных сигналов</a></h2>
+                    <div class="article-info">
+<footer class="post-info">
+    <div class="published">
+        <time datetime="2015-08-06T00:00:00+03:00"> 06.08.2015</time>
+    </div>
+
+
+
+<div class="tags">
+<i class="fa fa-tags"></i>&nbsp;
+	<a href="http://blog.maizy.ru/tag/akka">akka</a>
+        /
+	<a href="http://blog.maizy.ru/tag/devops">devops</a>
+</div>
+    
+</footer><!-- /.post-info -->                    </div>
+                <div class="summary"><p>Когда начал писать для себя <a href="https://github.com/maizy/akka-cluster-heartbeat">hello world на akka</a> сразу захотелось сделать какой-то артефакт, удобный для жизни в дикой среде production. Хочется, чтобы приложение вело себя как примерный гражданин, умело правильно реагировать на всякие системные сигналы и прочее.</p>
+<p>С упаковкой приложения в jar вместе с scala runtime удалось легко разобраться. Помогут <code>sbt-native-packager</code> и <code>sbt-assembly</code>. Напишу про это позже, когда ещё пойму как правильно результат сложить в .deb пакет.</p>
+<p>Не сразу почему-то удалось сделать правильные реагирования на сигналы системы. Меня пока не интересуют всякие специфичные штуки, достаточно было двух сигналов выключения - SIGINT и SIGTERM, по которым хотелось аккуратно потушить ноду в akka cluster - убить её локальные акторы, отсоединиться и пр.</p>
+<p>Сначала попробовал использовать модный_молодёжный метод <a href="http://www.scala-lang.org/api/current/index.html#scala.sys.package@addShutdownHook(body:=&gt;Unit):scala.sys.ShutdownHookThread">scala.sys.addShutdownHook</a>. Он принимает <code>=&gt; Unit</code> и выполняет его в отдельном треде, когда завершается jvm. Вызов не гарантируется, что в данном случае ок. Плюс метода - переносимость. Минус - код возврата не возможно поставить, метод <code>System.exit()</code> выполняется, но код не ставиться. Экспериментально понял, что на SIGINT код всегда 130, на SIGTERM - 146. Вторая проблема - akka при выключении часть логов пишет в stdout, которые при использовании хука уже не выводятся. Не проверял, но кажется stdout закрывается раньше, чем вызывается этот хук.</p>
+<p>Пришлось взять в руки обработчик сигналов и делать на нём. Он из пакета <code>sun.misc</code>, так что с альтернативными jvm могут быть вопросы, но меня это не волнует в данный момент.</p>
+<p>В итоге метод выглядит примерно так:</p>
+<div class="highlight"><pre><span class="k">import</span> <span class="nn">java.util.concurrent.atomic.AtomicBoolean</span>
+<span class="k">import</span> <span class="nn">sun.misc.SignalHandler</span>
+<span class="k">import</span> <span class="nn">sun.misc.Signal</span>
+<span class="k">import</span> <span class="nn">scala.concurrent.duration._</span>
+
+<span class="k">import</span> <span class="nn">com.typesafe.config.ConfigFactory</span>
+<span class="k">import</span> <span class="nn">akka.cluster.Cluster</span>
+<span class="k">import</span> <span class="nn">akka.actor.ActorSystem</span>
+<span class="k">import</span> <span class="nn">akka.util.Timeout</span>
+
+<span class="k">object</span> <span class="nc">Main</span> <span class="k">extends</span> <span class="nc">App</span> <span class="k">with</span> <span class="nc">SignalHandler</span> <span class="o">{</span>
+
+  <span class="k">val</span> <span class="nc">SIGING</span> <span class="k">=</span> <span class="s">&quot;INT&quot;</span>
+  <span class="k">val</span> <span class="nc">SIGTERM</span> <span class="k">=</span> <span class="s">&quot;TERM&quot;</span>
+
+  <span class="c1">// регистрируем сам App объект, как обработчик сигналов</span>
+  <span class="nc">Signal</span><span class="o">.</span><span class="n">handle</span><span class="o">(</span><span class="k">new</span> <span class="nc">Signal</span><span class="o">(</span><span class="nc">SIGING</span><span class="o">),</span> <span class="k">this</span><span class="o">)</span>
+  <span class="nc">Signal</span><span class="o">.</span><span class="n">handle</span><span class="o">(</span><span class="k">new</span> <span class="nc">Signal</span><span class="o">(</span><span class="nc">SIGTERM</span><span class="o">),</span> <span class="k">this</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="n">config</span> <span class="k">=</span> <span class="nc">ConfigFactory</span><span class="o">.</span><span class="n">load</span><span class="o">()</span>
+  <span class="k">val</span> <span class="n">system</span> <span class="k">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">&quot;main&quot;</span><span class="o">,</span> <span class="n">config</span><span class="o">)</span>
+  <span class="k">implicit</span> <span class="k">val</span> <span class="n">executionContext</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">dispatcher</span>
+  <span class="k">implicit</span> <span class="k">val</span> <span class="n">defaultTimeout</span> <span class="k">=</span> <span class="nc">Timeout</span><span class="o">(</span><span class="mf">500.</span><span class="n">millis</span><span class="o">)</span>
+  <span class="k">val</span> <span class="n">cluster</span> <span class="k">=</span> <span class="nc">Cluster</span><span class="o">(</span><span class="n">system</span><span class="o">)</span>
+
+  <span class="c1">//hook для akka, будет использоваться для любых остановок, не только по сигналам</span>
+  <span class="n">system</span><span class="o">.</span><span class="n">registerOnTermination</span> <span class="o">{</span>
+    <span class="nc">System</span><span class="o">.</span><span class="n">exit</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="k">val</span> <span class="n">terminated</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">AtomicBoolean</span><span class="o">(</span><span class="kc">false</span><span class="o">)</span>
+
+  <span class="c1">// собственно обработчик</span>
+  <span class="k">override</span> <span class="k">def</span> <span class="n">handle</span><span class="o">(</span><span class="n">signal</span><span class="k">:</span> <span class="kt">Signal</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">terminated</span><span class="o">.</span><span class="n">compareAndSet</span><span class="o">(</span><span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">SIGING</span><span class="o">,</span> <span class="nc">SIGTERM</span><span class="o">).</span><span class="n">contains</span><span class="o">(</span><span class="n">signal</span><span class="o">.</span><span class="n">getName</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">shutdown</span><span class="o">()</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>Теперь и сигналы честно обрабатываются, и коды возвратов правильные, и все выходы из приложения сводятся в хук для akka.</p>
+                </div>
+                <a class="btn btn-default btn-xs" href="http://blog.maizy.ru/posts/akka-graceful-shutdown#comments">прокомментировать</a>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="http://blog.maizy.ru/posts/akka-remote-n-cluster">Akka для распределённых приложений - remote vs cluster</a></h2>
                     <div class="article-info">
 <footer class="post-info">
