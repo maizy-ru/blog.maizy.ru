@@ -111,6 +111,8 @@ blog.maizy.ru            </a>
   <span class="k">val</span> <span class="nc">SIGING</span> <span class="k">=</span> <span class="s">&quot;INT&quot;</span>
   <span class="k">val</span> <span class="nc">SIGTERM</span> <span class="k">=</span> <span class="s">&quot;TERM&quot;</span>
 
+  <span class="k">val</span> <span class="n">terminated</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">AtomicBoolean</span><span class="o">(</span><span class="kc">false</span><span class="o">)</span>
+
   <span class="c1">// регистрируем сам App объект, как обработчик сигналов</span>
   <span class="nc">Signal</span><span class="o">.</span><span class="n">handle</span><span class="o">(</span><span class="k">new</span> <span class="nc">Signal</span><span class="o">(</span><span class="nc">SIGING</span><span class="o">),</span> <span class="k">this</span><span class="o">)</span>
   <span class="nc">Signal</span><span class="o">.</span><span class="n">handle</span><span class="o">(</span><span class="k">new</span> <span class="nc">Signal</span><span class="o">(</span><span class="nc">SIGTERM</span><span class="o">),</span> <span class="k">this</span><span class="o">)</span>
@@ -125,8 +127,6 @@ blog.maizy.ru            </a>
   <span class="n">system</span><span class="o">.</span><span class="n">registerOnTermination</span> <span class="o">{</span>
     <span class="nc">System</span><span class="o">.</span><span class="n">exit</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span>
   <span class="o">}</span>
-
-  <span class="k">val</span> <span class="n">terminated</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">AtomicBoolean</span><span class="o">(</span><span class="kc">false</span><span class="o">)</span>
 
   <span class="c1">// собственно обработчик</span>
   <span class="k">override</span> <span class="k">def</span> <span class="n">handle</span><span class="o">(</span><span class="n">signal</span><span class="k">:</span> <span class="kt">Signal</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
