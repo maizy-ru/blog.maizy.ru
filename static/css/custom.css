@@ -47,4 +47,8 @@ p {
     .published, .tags {
         display: inline;
     }
+
+    .article-image {
+        margin: 5px 5px 0 10px;
+    }
 }
