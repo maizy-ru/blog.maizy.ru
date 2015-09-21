@@ -74,6 +74,125 @@ blog.maizy.ru            </a>
         <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
 
             <article>
+                <h2><a href="http://blog.maizy.ru/posts/akka-cluster-testing">Akka. Тестирование в общем и про тестирование кластера в частности</a></h2>
+                    <div class="article-info">
+<footer class="post-info">
+    <div class="published">
+        <time datetime="2015-09-21T00:00:00+03:00"> 21.09.2015</time>
+    </div>
+
+
+
+<div class="tags">
+<i class="fa fa-tags"></i>&nbsp;
+	<a href="http://blog.maizy.ru/tag/akka">akka</a>
+        /
+	<a href="http://blog.maizy.ru/tag/scala">scala</a>
+</div>
+    
+</footer><!-- /.post-info -->                    </div>
+                <div class="summary"><p>Продолжая заниматься <a href="https://github.com/maizy/akka-cluster-heartbeat">hello world'ом на akka</a> погрузился в вопрос тестирования акторов.</p>
+<p>Общие вещи просты, не вижу смысла пересказывать <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html">документацию</a>, остановлюсь только на ключевых моментах и выводах.</p>
+<h3>Асинхронное vs синхронное тестирование</h3>
+<p>Есть два подхода <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html#Synchronous_Unit_Testing_with_TestActorRef">синхронное</a> и <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html#Asynchronous_Integration_Testing_with_TestKit">асинхронное</a> тестирование. Первое в реальной жизни почти никогда не нужно, если только не хочется протестировать какие-то уж совсем внутренние кишки актора. В остальных случаях, лучше тестировать честно, отправляя и принимая ответы от акторов.</p>
+<h3>TestProbe и TestActor</h3>
+<p>Часть которую важно понимать. Сначала я думал, что при тестировании будет какая-то чёрная магия, которая позволит мне получать сообщения, летающие между разными акторами.</p>
+<p>На деле всё проще. Внутри вашего TestCase создаётся TestProbe и TestActor, которые затем используются для запросов к акторам и анализа приходящих результатов. К сожалению, в документации сразу показывается пример с trait <code>ImplicitSender</code>, который слегка "гримирует" наличие testActor, что вызвало по началу повышенное количество wtf-per-line.</p>
+<p>Соответственно <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html#Built-In_Assertions">набор стандартных assert'ов</a> на самом деле вызывается у стандартного TestProbe. Конечно же таких TestProbe можно даже <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html#Using_Multiple_Probe_Actors">создать несколько</a> и, например, поместить в них дополнительные специфичные вам assert'ы.</p>
+<p>Отсюда же вывод, что для тестирования parent-child взаимодействия придётся вставлять между ними тестовый актор с проксированием сообщений, в документации <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html#Testing_parent-child_relationships">описаны способы сделать это</a>. В любом случае production код нужно немного к такому подготовить, другой вопрос, что изменения полезны и для других целей.</p>
+<h3>Cluster testing</h3>
+<p>С тестированием кластерных конфигурацию всё не так тривиально.</p>
+<p>Для начала есть решение <a href="https://github.com/sbt/sbt-multi-jvm">multi-jvm тестирования с плагином для sbt</a>, в документации к akka описано как <a href="http://doc.akka.io/docs/akka/2.3.14/dev/multi-jvm-testing.html">это всё подружить с тестами</a>, чтобы <a href="http://doc.akka.io/docs/akka/2.3.14/dev/multi-node-testing.html">получить Multi Node Testing</a>. Пригодится и для других задач, когда используется просто akka remote.</p>
+<p>Печалит, что нужно <a href="http://doc.akka.io/docs/akka/2.3.14/dev/multi-jvm-testing.html#multi-jvm-testing">серьёзно "испортить" конфиг sbt</a>, но, наверное, можно решить выносом таких тестов в отдельный sbt проект. Также ваша IntelliJ IDEA по понятным причинам про такие тесты ничего знать не будет, так как всё магия работает только в связке с sbt. Думаю, в ScalaIDE будет аналогично.</p>
+<p>Простого способа дебажить это тоже нет. Логи не очень удобны, так как валяться в параллель со всех JVM. В идеале нужно писать обёртки, которые будут собирать их по каждой ноде отдельно.</p>
+<h3>"... напоминает мне игру: "Что? Где? Когда?" называется! Непонятно, что где валяется и когда все это кончится!"</h3>
+<p>Общерекомендуемый подход писать multi-jvm тесты в одном классе, который будет одинаково выполняться на всех нодах. Это обязывает постоянно следить за тем какой код и где исполняется. Например, написанный в лоб assert будет выполнен на всех нодах, часть из которых может быть ещё не присоединена к кластеру.</p>
+<p>Постоянно об это спотыкался, но потом написал себе пару удобных утилиток:</p>
+<div class="highlight"><pre><span class="k">import</span> <span class="nn">scala.collection.mutable</span>
+<span class="k">import</span> <span class="nn">org.scalatest.</span><span class="o">{</span> <span class="nc">BeforeAndAfterAll</span><span class="o">,</span> <span class="nc">Matchers</span><span class="o">,</span> <span class="nc">Suite</span> <span class="o">}</span>
+<span class="k">import</span> <span class="nn">akka.cluster.Cluster</span>
+<span class="k">import</span> <span class="nn">akka.cluster.ClusterEvent.</span><span class="o">{</span> <span class="nc">CurrentClusterState</span><span class="o">,</span> <span class="nc">MemberUp</span> <span class="o">}</span>
+<span class="k">import</span> <span class="nn">akka.remote.testconductor.RoleName</span>
+<span class="k">import</span> <span class="nn">akka.remote.testkit.</span><span class="o">{</span> <span class="nc">MultiNodeSpec</span><span class="o">,</span> <span class="nc">MultiNodeConfig</span><span class="o">,</span> <span class="nc">MultiNodeSpecCallbacks</span> <span class="o">}</span>
+<span class="k">import</span> <span class="nn">akka.testkit.ImplicitSender</span>
+
+
+
+<span class="k">abstract</span> <span class="k">class</span> <span class="nc">MultiNodeBaseSpec</span><span class="o">(</span><span class="n">config</span><span class="k">:</span> <span class="kt">MultiNodeConfig</span><span class="o">)</span>
+  <span class="k">extends</span> <span class="nc">MultiNodeSpec</span><span class="o">(</span><span class="n">config</span><span class="o">)</span>
+  <span class="k">with</span> <span class="nc">Suite</span>
+  <span class="k">with</span> <span class="nc">BeforeAndAfterAll</span>
+  <span class="k">with</span> <span class="nc">MultiNodeSpecCallbacks</span>
+  <span class="k">with</span> <span class="nc">ImplicitSender</span>
+  <span class="k">with</span> <span class="nc">Matchers</span>
+<span class="o">{</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="n">beforeAll</span><span class="o">()</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="k">super</span><span class="o">.</span><span class="n">beforeAll</span><span class="o">()</span>
+    <span class="n">multiNodeSpecBeforeAll</span><span class="o">()</span>
+  <span class="o">}</span>
+
+  <span class="k">override</span> <span class="k">def</span> <span class="n">afterAll</span><span class="o">()</span> <span class="k">=</span> <span class="o">{</span>
+    <span class="n">enterBarrier</span><span class="o">(</span><span class="s">&quot;before-clean-up&quot;</span><span class="o">)</span>
+    <span class="n">cleanUp</span><span class="o">()</span>
+    <span class="n">enterBarrier</span><span class="o">(</span><span class="s">&quot;clean-up&quot;</span><span class="o">)</span>
+    <span class="n">multiNodeSpecAfterAll</span><span class="o">()</span>
+    <span class="k">super</span><span class="o">.</span><span class="n">afterAll</span><span class="o">()</span>
+  <span class="o">}</span>
+
+  <span class="k">def</span> <span class="n">cluster</span><span class="k">:</span> <span class="kt">Cluster</span> <span class="o">=</span> <span class="nc">Cluster</span><span class="o">(</span><span class="n">system</span><span class="o">)</span>
+  <span class="n">cluster</span><span class="o">.</span><span class="n">subscribe</span><span class="o">(</span><span class="n">testActor</span><span class="o">,</span> <span class="n">classOf</span><span class="o">[</span><span class="kt">MemberUp</span><span class="o">])</span>
+  <span class="n">expectMsgClass</span><span class="o">(</span><span class="n">classOf</span><span class="o">[</span><span class="kt">CurrentClusterState</span><span class="o">])</span>
+  <span class="n">println</span><span class="o">(</span><span class="n">s</span><span class="s">&quot;myself address: ${node(myself).address}, role: ${myself.name}&quot;</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="n">currentClusterNodes</span> <span class="k">=</span> <span class="n">mutable</span><span class="o">.</span><span class="nc">Set</span><span class="o">[</span><span class="kt">RoleName</span><span class="o">]()</span>
+
+  <span class="k">def</span> <span class="n">joinToCluster</span><span class="o">(</span><span class="n">nodes</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">RoleName</span><span class="o">],</span> <span class="n">seedNode</span><span class="k">:</span> <span class="kt">RoleName</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">currentClusterNodes</span> <span class="o">++=</span> <span class="n">nodes</span>
+    <span class="c1">// on new nodes await events for all cluster member</span>
+    <span class="n">runOn</span><span class="o">(</span><span class="n">nodes</span><span class="k">:</span> <span class="k">_</span><span class="kt">*</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">cluster</span> <span class="n">join</span> <span class="n">node</span><span class="o">(</span><span class="n">seedNode</span><span class="o">).</span><span class="n">address</span>
+      <span class="o">(</span><span class="n">receiveN</span><span class="o">(</span><span class="n">currentClusterNodes</span><span class="o">.</span><span class="n">size</span><span class="o">).</span><span class="n">collect</span> <span class="o">{</span> <span class="k">case</span> <span class="nc">MemberUp</span><span class="o">(</span><span class="n">member</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">member</span><span class="o">.</span><span class="n">address</span> <span class="o">}.</span><span class="n">toSet</span>
+        <span class="n">should</span> <span class="n">contain</span> <span class="n">theSameElementsAs</span> <span class="n">currentClusterNodes</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">node</span><span class="o">(</span><span class="k">_</span><span class="o">).</span><span class="n">address</span><span class="o">).</span><span class="n">toSet</span><span class="o">)</span>
+    <span class="o">}</span>
+
+    <span class="c1">// on existing nodes await events for only new cluster members</span>
+    <span class="n">runOn</span><span class="o">((</span><span class="n">currentClusterNodes</span> <span class="o">--</span> <span class="n">nodes</span><span class="o">.</span><span class="n">toSet</span><span class="o">).</span><span class="n">toList</span><span class="k">:</span> <span class="k">_</span><span class="kt">*</span><span class="o">)</span> <span class="o">{</span>
+      <span class="o">(</span><span class="n">receiveN</span><span class="o">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">size</span><span class="o">).</span><span class="n">collect</span> <span class="o">{</span> <span class="k">case</span> <span class="nc">MemberUp</span><span class="o">(</span><span class="n">member</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">member</span><span class="o">.</span><span class="n">address</span> <span class="o">}.</span><span class="n">toSet</span>
+        <span class="n">should</span> <span class="n">contain</span> <span class="n">theSameElementsAs</span> <span class="n">nodes</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">node</span><span class="o">(</span><span class="k">_</span><span class="o">).</span><span class="n">address</span><span class="o">).</span><span class="n">toSet</span><span class="o">)</span>
+    <span class="o">}</span>
+
+    <span class="n">enterBarrier</span><span class="o">(</span><span class="s">&quot;join-&quot;</span><span class="o">+</span> <span class="n">nodes</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">name</span><span class="o">).</span><span class="n">mkString</span><span class="o">(</span><span class="s">&quot;,&quot;</span><span class="o">))</span>
+  <span class="o">}</span>
+
+  <span class="k">def</span> <span class="n">runOnJoinedNodes</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="o">=&gt;</span> <span class="nc">Unit</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
+    <span class="n">runOn</span><span class="o">(</span><span class="n">currentClusterNodes</span><span class="o">.</span><span class="n">toList</span><span class="k">:</span> <span class="k">_</span><span class="kt">*</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">a</span>
+    <span class="o">}</span>
+
+  <span class="k">def</span> <span class="n">cleanUp</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span>
+    <span class="n">cluster</span><span class="o">.</span><span class="n">unsubscribe</span><span class="o">(</span><span class="n">testActor</span><span class="o">)</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>В базовом spec'е выше реализовано:</p>
+<ul>
+<li>подписывание на события кластера</li>
+<li>метод <code>joinToCluster</code> для правильного присоединения к кластеру нод</li>
+<li>метод <code>runOnJoinedNodes</code> для выполнения кода на уже работающих нодах кластера, аналогичный по использованию <a href="http://doc.akka.io/docs/akka/2.3.14/dev/multi-node-testing.html#A_Multi_Node_Testing_Example">встроенному <code>runOn</code></a></li>
+</ul>
+<h3>Тестирование сети</h3>
+<p>Есть встроенная поддержка тестирования транспорта и сети с возможностью эмуляции проблем между нодами (blackhole). При этом я надеюсь как-нибудь попробовать приспособить docker, его API и iptables для данных целей, благо multi-jvm, кажется умеет сам в тестах упаковывать тестовую ноду в jar, раскладывать через ssh+rsync, а затем запускать.</p>
+<h3>Примеры</h3>
+<p>Можно глянуть, что <a href="https://github.com/maizy/akka-cluster-heartbeat/tree/master/src/multi-jvm/scala">получилось у меня</a>. Много полезных примеров я обнаружил в <a href="https://github.com/akka/akka/tree/master/akka-cluster/src/multi-jvm/scala/akka/cluster">самих исходниках akka</a> и <a href="https://github.com/jboner/akka-crdt/tree/master/src/multi-jvm/scala/akka/crdt/convergent">в проекте akka crdt</a>.</p>
+<h3>Вывод</h3>
+<p>Тестировать akka, даже в сложных конфигурациях можно и нужно, но tooling ещё требует доработки.</p>
+                </div>
+                <a class="btn btn-default btn-xs" href="http://blog.maizy.ru/posts/akka-cluster-testing#comments">прокомментировать</a>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="http://blog.maizy.ru/posts/fpconf-2015">FPConf 2015 - заметки на полях</a></h2>
                     <div class="article-info">
 <footer class="post-info">

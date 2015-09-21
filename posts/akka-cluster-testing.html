@@ -2,7 +2,7 @@
 <html lang="ru"
 >
 <head>
-    <title>akka - blog.maizy.ru</title>
+    <title>Akka. Тестирование в общем и про тестирование кластера в частности - blog.maizy.ru</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -10,16 +10,22 @@
 
 
 
+<link rel="canonical" href="http://blog.maizy.ru/posts/akka-cluster-testing">
 
-    <meta name="author" content="Никита Ковалев" />
-    <meta name="keywords" content="akka" />
+        <meta name="author" content="Никита Ковалев" />
+        <meta name="keywords" content="akka,scala" />
+        <meta name="description" content="Продолжая заниматься hello world&#39;ом на akka погрузился в вопрос тестирования акторов. Общие вещи просты, не вижу смысла пересказывать документацию, остановлюсь только на ключевых моментах и выводах. Асинхронное vs синхронное тестирование Есть два подхода синхронное и асинхронное тестирование. Первое в реальной жизни почти никогда не нужно, если только не хочется протестировать какие-то уж совсем внутренние кишки актора. В остальных случаях, лучше тестировать честно, отправляя и принимая ответы от акторов. TestProbe и TestActor Часть которую важно понимать. Сначала я думал, что при тестировании будет какая-то чёрная магия, которая позволит мне получать сообщения, летающие между разными акторами. На деле всё проще. Внутри вашего TestCase создаётся TestProbe и TestActor, которые затем используются для запросов к акторам и анализа приходящих результатов. К сожалению, в документации сразу показывается пример с trait ImplicitSender, который слегка &#34;гримирует&#34; наличие testActor, что вызвало по началу повышенное количество wtf-per-line. Соответственно набор стандартных assert&#39;ов на самом деле вызывается у стандартного TestProbe. Конечно же таких TestProbe можно даже создать несколько и, например, поместить в них дополнительные специфичные вам assert&#39;ы. Отсюда же вывод, что для тестирования parent-child взаимодействия придётся вставлять между ними тестовый актор с проксированием сообщений, в документации описаны способы сделать это. В любом случае production код нужно немного к такому подготовить, другой вопрос, что изменения полезны и для других целей. Cluster testing С тестированием кластерных конфигурацию всё не так тривиально. Для начала есть решение multi-jvm тестирования с плагином для sbt, в документации к akka описано как это всё подружить с тестами, чтобы получить Multi Node Testing. Пригодится и для других задач, когда используется просто akka remote. Печалит, что нужно серьёзно &#34;испортить&#34; конфиг sbt, но, наверное, можно решить выносом таких тестов в отдельный sbt проект. Также ваша IntelliJ IDEA по понятным причинам про такие тесты ничего знать не будет, так как всё магия работает только в связке с sbt. Думаю, в ScalaIDE будет аналогично. Простого способа дебажить это тоже нет. Логи не очень удобны, так как валяться в параллель со всех JVM. В идеале нужно писать обёртки, которые будут собирать их по каждой ноде отдельно. &#34;... напоминает мне игру: &#34;Что? Где? Когда?&#34; называется! Непонятно, что где валяется и когда все это кончится!&#34; Общерекомендуемый подход писать multi-jvm тесты в одном классе, который будет одинаково выполняться на всех нодах. Это обязывает постоянно следить за тем какой код и где исполняется. Например, написанный в лоб assert будет выполнен на всех нодах, часть из которых может быть ещё не присоединена к кластеру. Постоянно об это спотыкался, но потом написал себе пару удобных утилиток: import scala.collection.mutable import org.scalatest.{ BeforeAndAfterAll, Matchers, Suite } import akka.cluster.Cluster import akka.cluster.ClusterEvent.{ CurrentClusterState, MemberUp } import akka.remote.testconductor.RoleName import akka.remote.testkit.{ MultiNodeSpec, MultiNodeConfig, MultiNodeSpecCallbacks } import akka.testkit.ImplicitSender abstract class MultiNodeBaseSpec(config: MultiNodeConfig) extends MultiNodeSpec(config) with Suite with BeforeAndAfterAll with MultiNodeSpecCallbacks with ImplicitSender with Matchers { override def beforeAll() = { super.beforeAll() multiNodeSpecBeforeAll() } override def afterAll() = { enterBarrier(&#34;before-clean-up&#34;) cleanUp() enterBarrier(&#34;clean-up&#34;) multiNodeSpecAfterAll() super.afterAll() } def cluster: Cluster = Cluster(system) cluster.subscribe(testActor, classOf[MemberUp]) expectMsgClass(classOf[CurrentClusterState]) println(s&#34;myself address: ${node(myself).address}, role: ${myself.name}&#34;) val currentClusterNodes = mutable.Set[RoleName]() def joinToCluster(nodes: Seq[RoleName], seedNode: RoleName): Unit = { currentClusterNodes ++= nodes // on new nodes await events for all cluster member runOn(nodes: _*) { cluster join node(seedNode).address (receiveN(currentClusterNodes.size).collect { case MemberUp(member) =&gt; member.address }.toSet should contain theSameElementsAs currentClusterNodes.map(node(_).address).toSet) } // on existing nodes await events for only new cluster members runOn((currentClusterNodes -- nodes.toSet).toList: _*) { (receiveN(nodes.size).collect { case MemberUp(member) =&gt; member.address }.toSet should contain theSameElementsAs nodes.map(node(_).address).toSet) } enterBarrier(&#34;join-&#34;+ nodes.map(_.name).mkString(&#34;,&#34;)) } def runOnJoinedNodes(a: =&gt; Unit): Unit = runOn(currentClusterNodes.toList: _*) { a } def cleanUp(): Unit = cluster.unsubscribe(testActor) } В базовом spec&#39;е выше реализовано: подписывание на события кластера метод joinToCluster для правильного присоединения к кластеру нод метод runOnJoinedNodes для выполнения кода на уже работающих нодах кластера, аналогичный по использованию встроенному runOn Тестирование сети Есть встроенная поддержка тестирования транспорта и сети с возможностью эмуляции проблем между нодами (blackhole). При этом я надеюсь как-нибудь попробовать приспособить docker, его API и iptables для данных целей, благо multi-jvm, кажется умеет сам в тестах упаковывать тестовую ноду в jar, раскладывать через ssh+rsync, а затем запускать. Примеры Можно глянуть, что получилось у меня. Много полезных примеров я обнаружил в самих исходниках akka и в проекте akka crdt. Вывод Тестировать akka, даже в сложных конфигурациях можно и нужно, но tooling ещё требует доработки." />
 
-    <!-- Open Graph tags -->
         <meta property="og:site_name" content="blog.maizy.ru" />
-        <meta property="og:type" content="website"/>
-        <meta property="og:title" content="blog.maizy.ru"/>
-        <meta property="og:url" content="http://blog.maizy.ru"/>
-        <meta property="og:description" content="blog.maizy.ru"/>
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Akka. Тестирование в общем и про тестирование кластера в частности"/>
+        <meta property="og:url" content="http://blog.maizy.ru/posts/akka-cluster-testing"/>
+        <meta property="og:description" content="Продолжая заниматься hello world&#39;ом на akka погрузился в вопрос тестирования акторов. Общие вещи просты, не вижу смысла пересказывать документацию, остановлюсь только на ключевых моментах и выводах. Асинхронное vs синхронное тестирование Есть два подхода синхронное и асинхронное тестирование. Первое в реальной жизни почти никогда не нужно, если только не хочется протестировать какие-то уж совсем внутренние кишки актора. В остальных случаях, лучше тестировать честно, отправляя и принимая ответы от акторов. TestProbe и TestActor Часть которую важно понимать. Сначала я думал, что при тестировании будет какая-то чёрная магия, которая позволит мне получать сообщения, летающие между разными акторами. На деле всё проще. Внутри вашего TestCase создаётся TestProbe и TestActor, которые затем используются для запросов к акторам и анализа приходящих результатов. К сожалению, в документации сразу показывается пример с trait ImplicitSender, который слегка &#34;гримирует&#34; наличие testActor, что вызвало по началу повышенное количество wtf-per-line. Соответственно набор стандартных assert&#39;ов на самом деле вызывается у стандартного TestProbe. Конечно же таких TestProbe можно даже создать несколько и, например, поместить в них дополнительные специфичные вам assert&#39;ы. Отсюда же вывод, что для тестирования parent-child взаимодействия придётся вставлять между ними тестовый актор с проксированием сообщений, в документации описаны способы сделать это. В любом случае production код нужно немного к такому подготовить, другой вопрос, что изменения полезны и для других целей. Cluster testing С тестированием кластерных конфигурацию всё не так тривиально. Для начала есть решение multi-jvm тестирования с плагином для sbt, в документации к akka описано как это всё подружить с тестами, чтобы получить Multi Node Testing. Пригодится и для других задач, когда используется просто akka remote. Печалит, что нужно серьёзно &#34;испортить&#34; конфиг sbt, но, наверное, можно решить выносом таких тестов в отдельный sbt проект. Также ваша IntelliJ IDEA по понятным причинам про такие тесты ничего знать не будет, так как всё магия работает только в связке с sbt. Думаю, в ScalaIDE будет аналогично. Простого способа дебажить это тоже нет. Логи не очень удобны, так как валяться в параллель со всех JVM. В идеале нужно писать обёртки, которые будут собирать их по каждой ноде отдельно. &#34;... напоминает мне игру: &#34;Что? Где? Когда?&#34; называется! Непонятно, что где валяется и когда все это кончится!&#34; Общерекомендуемый подход писать multi-jvm тесты в одном классе, который будет одинаково выполняться на всех нодах. Это обязывает постоянно следить за тем какой код и где исполняется. Например, написанный в лоб assert будет выполнен на всех нодах, часть из которых может быть ещё не присоединена к кластеру. Постоянно об это спотыкался, но потом написал себе пару удобных утилиток: import scala.collection.mutable import org.scalatest.{ BeforeAndAfterAll, Matchers, Suite } import akka.cluster.Cluster import akka.cluster.ClusterEvent.{ CurrentClusterState, MemberUp } import akka.remote.testconductor.RoleName import akka.remote.testkit.{ MultiNodeSpec, MultiNodeConfig, MultiNodeSpecCallbacks } import akka.testkit.ImplicitSender abstract class MultiNodeBaseSpec(config: MultiNodeConfig) extends MultiNodeSpec(config) with Suite with BeforeAndAfterAll with MultiNodeSpecCallbacks with ImplicitSender with Matchers { override def beforeAll() = { super.beforeAll() multiNodeSpecBeforeAll() } override def afterAll() = { enterBarrier(&#34;before-clean-up&#34;) cleanUp() enterBarrier(&#34;clean-up&#34;) multiNodeSpecAfterAll() super.afterAll() } def cluster: Cluster = Cluster(system) cluster.subscribe(testActor, classOf[MemberUp]) expectMsgClass(classOf[CurrentClusterState]) println(s&#34;myself address: ${node(myself).address}, role: ${myself.name}&#34;) val currentClusterNodes = mutable.Set[RoleName]() def joinToCluster(nodes: Seq[RoleName], seedNode: RoleName): Unit = { currentClusterNodes ++= nodes // on new nodes await events for all cluster member runOn(nodes: _*) { cluster join node(seedNode).address (receiveN(currentClusterNodes.size).collect { case MemberUp(member) =&gt; member.address }.toSet should contain theSameElementsAs currentClusterNodes.map(node(_).address).toSet) } // on existing nodes await events for only new cluster members runOn((currentClusterNodes -- nodes.toSet).toList: _*) { (receiveN(nodes.size).collect { case MemberUp(member) =&gt; member.address }.toSet should contain theSameElementsAs nodes.map(node(_).address).toSet) } enterBarrier(&#34;join-&#34;+ nodes.map(_.name).mkString(&#34;,&#34;)) } def runOnJoinedNodes(a: =&gt; Unit): Unit = runOn(currentClusterNodes.toList: _*) { a } def cleanUp(): Unit = cluster.unsubscribe(testActor) } В базовом spec&#39;е выше реализовано: подписывание на события кластера метод joinToCluster для правильного присоединения к кластеру нод метод runOnJoinedNodes для выполнения кода на уже работающих нодах кластера, аналогичный по использованию встроенному runOn Тестирование сети Есть встроенная поддержка тестирования транспорта и сети с возможностью эмуляции проблем между нодами (blackhole). При этом я надеюсь как-нибудь попробовать приспособить docker, его API и iptables для данных целей, благо multi-jvm, кажется умеет сам в тестах упаковывать тестовую ноду в jar, раскладывать через ssh+rsync, а затем запускать. Примеры Можно глянуть, что получилось у меня. Много полезных примеров я обнаружил в самих исходниках akka и в проекте akka crdt. Вывод Тестировать akka, даже в сложных конфигурациях можно и нужно, но tooling ещё требует доработки."/>
+        <meta property="article:published_time" content="2015-09-21" />
+            <meta property="article:section" content="Tech" />
+            <meta property="article:tag" content="akka" />
+            <meta property="article:tag" content="scala" />
+            <meta property="article:author" content="Никита Ковалев" />
 
 
     <!-- Bootstrap -->
@@ -55,7 +61,7 @@ blog.maizy.ru            </a>
                         <li >
                             <a href="http://blog.maizy.ru/life">Life</a>
                         </li>
-                        <li >
+                        <li class="active">
                             <a href="http://blog.maizy.ru/">Tech</a>
                         </li>
             </ul>
@@ -73,9 +79,17 @@ blog.maizy.ru            </a>
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
 
-            <article>
-                <h2><a href="http://blog.maizy.ru/posts/akka-cluster-testing">Akka. Тестирование в общем и про тестирование кластера в частности</a></h2>
-                    <div class="article-info">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.maizy.ru/posts/akka-cluster-testing"
+                       rel="bookmark"
+                       title="Permalink to Akka. Тестирование в общем и про тестирование кластера в частности">
+                        Akka. Тестирование в общем и про тестирование кластера в частности
+                    </a>
+                </h1>
+                <div class="article-info">
 <footer class="post-info">
     <div class="published">
         <time datetime="2015-09-21T00:00:00+03:00"> 21.09.2015</time>
@@ -90,8 +104,10 @@ blog.maizy.ru            </a>
 	<a href="http://blog.maizy.ru/tag/scala">scala</a>
 </div>
     
-</footer><!-- /.post-info -->                    </div>
-                <div class="summary"><p>Продолжая заниматься <a href="https://github.com/maizy/akka-cluster-heartbeat">hello world'ом на akka</a> погрузился в вопрос тестирования акторов.</p>
+</footer><!-- /.post-info -->                </div>
+            </header>
+            <div class="entry-content">
+                <p>Продолжая заниматься <a href="https://github.com/maizy/akka-cluster-heartbeat">hello world'ом на akka</a> погрузился в вопрос тестирования акторов.</p>
 <p>Общие вещи просты, не вижу смысла пересказывать <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html">документацию</a>, остановлюсь только на ключевых моментах и выводах.</p>
 <h3>Асинхронное vs синхронное тестирование</h3>
 <p>Есть два подхода <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html#Synchronous_Unit_Testing_with_TestActorRef">синхронное</a> и <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html#Asynchronous_Integration_Testing_with_TestKit">асинхронное</a> тестирование. Первое в реальной жизни почти никогда не нужно, если только не хочется протестировать какие-то уж совсем внутренние кишки актора. В остальных случаях, лучше тестировать честно, отправляя и принимая ответы от акторов.</p>
@@ -188,133 +204,40 @@ blog.maizy.ru            </a>
 <p>Можно глянуть, что <a href="https://github.com/maizy/akka-cluster-heartbeat/tree/master/src/multi-jvm/scala">получилось у меня</a>. Много полезных примеров я обнаружил в <a href="https://github.com/akka/akka/tree/master/akka-cluster/src/multi-jvm/scala/akka/cluster">самих исходниках akka</a> и <a href="https://github.com/jboner/akka-crdt/tree/master/src/multi-jvm/scala/akka/crdt/convergent">в проекте akka crdt</a>.</p>
 <h3>Вывод</h3>
 <p>Тестировать akka, даже в сложных конфигурациях можно и нужно, но tooling ещё требует доработки.</p>
-                </div>
-                <a class="btn btn-default btn-xs" href="http://blog.maizy.ru/posts/akka-cluster-testing#comments">прокомментировать</a>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="http://blog.maizy.ru/posts/akka-graceful-shutdown">Akka graceful shutdown и обработка системных сигналов</a></h2>
-                    <div class="article-info">
-<footer class="post-info">
-    <div class="published">
-        <time datetime="2015-08-06T00:00:00+03:00"> 06.08.2015</time>
-    </div>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
 
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'blogmaizyru'; // required: replace example with your forum shortname
 
+                    var disqus_identifier = 'akka-cluster-testing';
+                var disqus_url = 'http://blog.maizy.ru/posts/akka-cluster-testing';
 
-<div class="tags">
-<i class="fa fa-tags"></i>&nbsp;
-	<a href="http://blog.maizy.ru/tag/akka">akka</a>
-        /
-	<a href="http://blog.maizy.ru/tag/devops">devops</a>
-</div>
-    
-</footer><!-- /.post-info -->                    </div>
-                <div class="summary"><p>Когда начал писать для себя <a href="https://github.com/maizy/akka-cluster-heartbeat">hello world на akka</a> сразу захотелось сделать какой-то артефакт, удобный для жизни в дикой среде production. Хочется, чтобы приложение вело себя как примерный гражданин, умело правильно реагировать на всякие системные сигналы и прочее.</p>
-<p>С упаковкой приложения в jar вместе с scala runtime удалось легко разобраться. Помогут <code>sbt-native-packager</code> и <code>sbt-assembly</code>. Напишу про это позже, когда ещё пойму как правильно результат сложить в .deb пакет.</p>
-<p>Не сразу почему-то удалось сделать правильные реагирования на сигналы системы. Меня пока не интересуют всякие специфичные штуки, достаточно было двух сигналов выключения - SIGINT и SIGTERM, по которым хотелось аккуратно потушить ноду в akka cluster - убить её локальные акторы, отсоединиться и пр.</p>
-<p>Сначала попробовал использовать модный_молодёжный метод <a href="http://www.scala-lang.org/api/current/index.html#scala.sys.package@addShutdownHook(body:=&gt;Unit):scala.sys.ShutdownHookThread">scala.sys.addShutdownHook</a>. Он принимает <code>=&gt; Unit</code> и выполняет его в отдельном треде, когда завершается jvm. Вызов не гарантируется, что в данном случае ок. Плюс метода - переносимость. Минус - код возврата не возможно поставить, метод <code>System.exit()</code> выполняется, но код не ставиться. Экспериментально понял, что на SIGINT код всегда 130, на SIGTERM - 146. Вторая проблема - akka при выключении часть логов пишет в stdout, которые при использовании хука уже не выводятся. Не проверял, но кажется stdout закрывается раньше, чем вызывается этот хук.</p>
-<p>Пришлось взять в руки обработчик сигналов и делать на нём. Он из пакета <code>sun.misc</code>, так что с альтернативными jvm могут быть вопросы, но меня это не волнует в данный момент.</p>
-<p>В итоге метод выглядит примерно так:</p>
-<div class="highlight"><pre><span class="k">import</span> <span class="nn">java.util.concurrent.atomic.AtomicBoolean</span>
-<span class="k">import</span> <span class="nn">sun.misc.SignalHandler</span>
-<span class="k">import</span> <span class="nn">sun.misc.Signal</span>
-<span class="k">import</span> <span class="nn">scala.concurrent.duration._</span>
+            var disqus_config = function () {
+                this.language = "ru";
+            };
 
-<span class="k">import</span> <span class="nn">com.typesafe.config.ConfigFactory</span>
-<span class="k">import</span> <span class="nn">akka.cluster.Cluster</span>
-<span class="k">import</span> <span class="nn">akka.actor.ActorSystem</span>
-<span class="k">import</span> <span class="nn">akka.util.Timeout</span>
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 
-<span class="k">object</span> <span class="nc">Main</span> <span class="k">extends</span> <span class="nc">App</span> <span class="k">with</span> <span class="nc">SignalHandler</span> <span class="o">{</span>
-
-  <span class="k">val</span> <span class="nc">SIGING</span> <span class="k">=</span> <span class="s">&quot;INT&quot;</span>
-  <span class="k">val</span> <span class="nc">SIGTERM</span> <span class="k">=</span> <span class="s">&quot;TERM&quot;</span>
-
-  <span class="k">val</span> <span class="n">terminated</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">AtomicBoolean</span><span class="o">(</span><span class="kc">false</span><span class="o">)</span>
-
-  <span class="c1">// регистрируем сам App объект, как обработчик сигналов</span>
-  <span class="nc">Signal</span><span class="o">.</span><span class="n">handle</span><span class="o">(</span><span class="k">new</span> <span class="nc">Signal</span><span class="o">(</span><span class="nc">SIGING</span><span class="o">),</span> <span class="k">this</span><span class="o">)</span>
-  <span class="nc">Signal</span><span class="o">.</span><span class="n">handle</span><span class="o">(</span><span class="k">new</span> <span class="nc">Signal</span><span class="o">(</span><span class="nc">SIGTERM</span><span class="o">),</span> <span class="k">this</span><span class="o">)</span>
-
-  <span class="k">val</span> <span class="n">config</span> <span class="k">=</span> <span class="nc">ConfigFactory</span><span class="o">.</span><span class="n">load</span><span class="o">()</span>
-  <span class="k">val</span> <span class="n">system</span> <span class="k">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">&quot;main&quot;</span><span class="o">,</span> <span class="n">config</span><span class="o">)</span>
-  <span class="k">implicit</span> <span class="k">val</span> <span class="n">executionContext</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">dispatcher</span>
-  <span class="k">implicit</span> <span class="k">val</span> <span class="n">defaultTimeout</span> <span class="k">=</span> <span class="nc">Timeout</span><span class="o">(</span><span class="mf">500.</span><span class="n">millis</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">cluster</span> <span class="k">=</span> <span class="nc">Cluster</span><span class="o">(</span><span class="n">system</span><span class="o">)</span>
-
-  <span class="c1">//hook для akka, будет использоваться для любых остановок, не только по сигналам</span>
-  <span class="n">system</span><span class="o">.</span><span class="n">registerOnTermination</span> <span class="o">{</span>
-    <span class="nc">System</span><span class="o">.</span><span class="n">exit</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span>
-  <span class="o">}</span>
-
-  <span class="c1">// собственно обработчик</span>
-  <span class="k">override</span> <span class="k">def</span> <span class="n">handle</span><span class="o">(</span><span class="n">signal</span><span class="k">:</span> <span class="kt">Signal</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
-    <span class="k">if</span> <span class="o">(</span><span class="n">terminated</span><span class="o">.</span><span class="n">compareAndSet</span><span class="o">(</span><span class="kc">false</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nc">List</span><span class="o">(</span><span class="nc">SIGING</span><span class="o">,</span> <span class="nc">SIGTERM</span><span class="o">).</span><span class="n">contains</span><span class="o">(</span><span class="n">signal</span><span class="o">.</span><span class="n">getName</span><span class="o">))</span> <span class="o">{</span>
-        <span class="n">system</span><span class="o">.</span><span class="n">shutdown</span><span class="o">()</span>
-    <span class="o">}</span>
-  <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-
-<p>Теперь и сигналы честно обрабатываются, и коды возвратов правильные, и все выходы из приложения сводятся в хук для akka.</p>
-                </div>
-                <a class="btn btn-default btn-xs" href="http://blog.maizy.ru/posts/akka-graceful-shutdown#comments">прокомментировать</a>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="http://blog.maizy.ru/posts/akka-remote-n-cluster">Akka для распределённых приложений - remote vs cluster</a></h2>
-                    <div class="article-info">
-<footer class="post-info">
-    <div class="published">
-        <time datetime="2015-07-20T00:00:00+03:00"> 20.07.2015</time>
-    </div>
-
-
-
-<div class="tags">
-<i class="fa fa-tags"></i>&nbsp;
-	<a href="http://blog.maizy.ru/tag/akka">akka</a>
-</div>
-    
-</footer><!-- /.post-info -->                    </div>
-                <div class="summary"><p>Буду делать небольшие заметки на полях по результатам изучения akka.</p>
-<p>Akka – это система акторов на jvm, реализованная на scala. Можно использовать и из java. Про саму концепцию акторов можно почитать в <a href="https://ru.wikipedia.org/wiki/Модель_акторов">интернетах</a>, здесь я буду останавливаться на особенностях akka.</p>
-<h3>Что читать?</h3>
-<p>Я пока рекомендую такие источники:</p>
-<ul>
-<li>
-<p><a href="http://akka.io/docs/">официальная документация</a> - она хорошая, содержит как теоретические основы, так и конкретные примеры кода и описания API. Можно читать из начала в конец, как книгу. Есть <a href="http://doc.akka.io/docs/akka/2.3.12/AkkaScala.pdf">pdf</a>.</p>
-</li>
-<li>
-<p>"Akka in Action" by Raymond Roestenburg, Rob Bakker, and Rob Williams - неплохая книга. Я читаю 16 MEAP (early access), к осени-зиме 2015 обещают релиз. <a href="http://www.manning.com/roestenburg/">Цена 40$</a>. В основном ориентируюсь на документацию, но в книге  плюс - итеративный подход к реализации демо проекта. Начинают с hello world'ов и далее по нарастающей. Было полезно, когда хотелось быстрого старта без изучения всех тонкостей теории.</p>
-</li>
-<li>
-<p>Stack Overflow - как всегда стоит делать аккуратно. Фреймворк активно развивается, некоторые вещи появляются, которые раньше нужно было самому велосипедить, некоторые становятся deprecated и пр., но есть не мало полезных объяснений.</p>
-</li>
-<li>
-<p>Googling по тонким вопросам и непоняткам, который нередко приводит в google группу akka.</p>
-</li>
-</ul>
-<p>Если жалко 40$, то книгу можно не покупать. Благородя Typesafe хайпа в сети по akka хватает. Для фреймворка – это хорошо.</p>
-<h3>Применимость</h3>
-<p>Меня akka интересует в основном с точки зрения распределённых систем.
-Однако akka работает и на одной jvm. Даже есть <a href="http://engineering.intenthq.com/2015/06/wikidata-akka-streams/">успешные кейсы</a>, когда в такой подход даёт выигрыш в противовес обычным многопоточным потокам.</p>
-<p>При этом akka имеет грамотный подход – реализации работы различных механизмов по сети ставиться во главу угла, а локальная работа рассматривается, как один из способов оптимизации.</p>
-<h3>remote vs cluster</h3>
-<p>В akka есть понятие "<a href="http://doc.akka.io/docs/akka/2.3.12/scala/remoting.html">akka remote</a>" – это возможность работать с любыми акторами прозрачно, не зная, где именно они находятся - локально или удалённо. Вы должны каким-либо образом знать, как до этих акторов добраться и эта реализация на вашей ответственности.</p>
-<p>Поверх akka remote строиться <a href="http://doc.akka.io/docs/akka/2.3.12/common/cluster.html">akka cluster</a>, который реализует кластерное решение, т.е. количество нод может динамически меняться, каждой ноде может быть назначена роль, которую она исполняет в системе.</p>
-<p>Ноды договариваются с друг другом по <a href="http://doc.akka.io/docs/akka/2.3.12/common/cluster.html#Gossip">gossip протоколу</a> и внутри используют для хранения состояния CRDT структуры. Одна из нод назначается мастером, если она погасла мастером станет автоматически другая нода.</p>
-<p>Гашение нод вы определяете сами, система только говорит, что нода стала не доступна, вы сами можете решить, что делать - удалять её из кластера или нет. Есть стандартная реализация, когда нода удаляется после недоступности в течении какого-то времени.</p>
-<p>На события кластера, или более точно на жизненный цикл его нод, <a href="http://doc.akka.io/docs/akka/2.3.12/scala/cluster-usage.html#A_Simple_Cluster_Example">можно подписаться</a>.</p>
-<p>Некоторые вещи в akka cluster ещё только в <a href="http://doc.akka.io/docs/akka/2.3.12/common/cluster.html#niy">планах на реализацию</a>.</p>
-<p>Нет встроенного механизма сказать кластеру "я запустился", у ноды при старте должен быть список seed нод, хотя бы одна из которых должна работать. Seed нодой может быть любая нода работающего кластера. Т.е. в реальной жизни тут нужно будет брать какие-то решения для discovery. Как вариант предлагают также держать ноды, которые ничего не делают (не запускают пользовательские акторы), а только используются как seed ноды.</p>
-<p>Пока всё. Некоторые из аспектов описанных выше я буду изучать подробнее и ещё про них напишу. Если найдёте в моих записях ошибки, буду раз замечаниям.</p>
-                </div>
-                <a class="btn btn-default btn-xs" href="http://blog.maizy.ru/posts/akka-remote-n-cluster#comments">прокомментировать</a>
-            </article>
-            <hr/>
+    </section>
+        </article>
+    </section>
 
         </div>
     </div>
