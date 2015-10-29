@@ -160,7 +160,7 @@ blog.maizy.ru            </a>
   <span class="k">def</span> <span class="n">cluster</span><span class="k">:</span> <span class="kt">Cluster</span> <span class="o">=</span> <span class="nc">Cluster</span><span class="o">(</span><span class="n">system</span><span class="o">)</span>
   <span class="n">cluster</span><span class="o">.</span><span class="n">subscribe</span><span class="o">(</span><span class="n">testActor</span><span class="o">,</span> <span class="n">classOf</span><span class="o">[</span><span class="kt">MemberUp</span><span class="o">])</span>
   <span class="n">expectMsgClass</span><span class="o">(</span><span class="n">classOf</span><span class="o">[</span><span class="kt">CurrentClusterState</span><span class="o">])</span>
-  <span class="n">println</span><span class="o">(</span><span class="n">s</span><span class="s">&quot;myself address: ${node(myself).address}, role: ${myself.name}&quot;</span><span class="o">)</span>
+  <span class="n">println</span><span class="o">(</span><span class="s">s&quot;myself address: </span><span class="si">${</span><span class="n">node</span><span class="o">(</span><span class="n">myself</span><span class="o">).</span><span class="n">address</span><span class="si">}</span><span class="s">, role: </span><span class="si">${</span><span class="n">myself</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s">&quot;</span><span class="o">)</span>
 
   <span class="k">val</span> <span class="n">currentClusterNodes</span> <span class="k">=</span> <span class="n">mutable</span><span class="o">.</span><span class="nc">Set</span><span class="o">[</span><span class="kt">RoleName</span><span class="o">]()</span>
 
