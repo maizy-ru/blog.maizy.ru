@@ -144,10 +144,11 @@
 &lt;p&gt;Можно глянуть, что &lt;a href="https://github.com/maizy/akka-cluster-heartbeat/tree/master/src/multi-jvm/scala"&gt;получилось у меня&lt;/a&gt;. Много полезных примеров я обнаружил в &lt;a href="https://github.com/akka/akka/tree/master/akka-cluster/src/multi-jvm/scala/akka/cluster"&gt;самих исходниках akka&lt;/a&gt; и &lt;a href="https://github.com/jboner/akka-crdt/tree/master/src/multi-jvm/scala/akka/crdt/convergent"&gt;в проекте akka crdt&lt;/a&gt;.&lt;/p&gt;
 &lt;h3&gt;Вывод&lt;/h3&gt;
 &lt;p&gt;Тестировать akka, даже в сложных конфигурациях можно и нужно, но tooling ещё требует доработки.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Никита Ковалев</dc:creator><pubDate>Mon, 21 Sep 2015 00:00:00 +0300</pubDate><guid>tag:blog.maizy.ru,2015-09-21:posts/akka-cluster-testing</guid><category>akka</category><category>scala</category></item><item><title>FPConf 2015 - заметки на полях</title><link>http://blog.maizy.ru/posts/fpconf-2015</link><description>&lt;p&gt;Побывал на конференции &lt;a href="http://fpconf.ru/"&gt;FPConf&lt;/a&gt;. Поделюсь своими мыслями, возникшими при прослушивании докладов. Я в основном сидел на втором потоке, где было про scala, UI и пр. Первый поток был преимущественно про Erlang и Haskell.&lt;/p&gt;
-&lt;p&gt;Организаторы обещали, что будет видео, надеюсь пополнить эту статью ссылкам в будущем.&lt;/p&gt;
-&lt;h3&gt;Cамурайский путь молодого scala-программиста, Сергей Лобин, Sputnik.ru&lt;/h3&gt;
+&lt;p&gt;&lt;s&gt;Организаторы обещали, что будет видео, надеюсь пополнить эту статью ссылкам в будущем.&lt;/s&gt;&lt;/p&gt;
+&lt;p&gt;Upd 09.12.2015: дополнил.&lt;/p&gt;
+&lt;h3&gt;&lt;a href="http://www.youtube.com/watch?v=Pu3D5GQ6UEg"&gt;Cамурайский путь молодого scala-программиста, Сергей Лобин, Sputnik.ru&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;В докладе было мало про scala, больше про проблемы при разработки геокодера в Спутнике. Главный печальный для всех фанатов Scala вывод – Scala в production и них не прижилась, найти разработчиков сложно, Go разработчиков найти значительно проще.&lt;/p&gt;
-&lt;h3&gt;Макросы scala, Михаил Муцянко, JetBrains&lt;/h3&gt;
+&lt;h3&gt;&lt;a href="http://www.youtube.com/watch?v=xd2xtQ61zKo"&gt;Макросы scala, Михаил Муцянко, JetBrains&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Хороший вводный доклад про макросы Scala от разработчика &lt;a href="http://blog.jetbrains.com/scala/"&gt;Scala plugin в IDEA&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Из запомнившегося:&lt;/p&gt;
 &lt;p&gt;Удобный способ построения AST в макросе через &lt;a href="http://docs.scala-lang.org/overviews/quasiquotes/intro.html"&gt;Q интерполятор&lt;/a&gt; (квазикватирование).&lt;/p&gt;
@@ -155,7 +156,7 @@
 &lt;p&gt;В 2.12 ожидается значительное улучшение в деле разработки макросов за счёт нового проекта &lt;a href="http://scalameta.org/"&gt;ScalaMeta&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Хорошая ссылка на изучение: What Are Macros Good For? от Евгения Бурмако &lt;a href="http://www.youtube.com/watch?v=4Rxo_7lrb7Y"&gt;YouTube&lt;/a&gt;, &lt;a href="http://scalamacros.org/paperstalks/2013-07-17-WhatAreMacrosGoodFor.pdf"&gt;слайды&lt;/a&gt;. BTW про самого Евгения и его работу над Scala макросами можно узнать в &lt;a href="http://eax.me/eaxcast-s02e10/"&gt;EaxCast S02E10&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Доклад рекомендую к просмотру.&lt;/p&gt;
-&lt;h3&gt;Встраивание языка в строковой интерполятор, Михаил Лиманский, ЭСК&lt;/h3&gt;
+&lt;h3&gt;&lt;a href="http://www.youtube.com/watch?v=q6H7T-8GOLk"&gt;Встраивание языка в строковой интерполятор, Михаил Лиманский, ЭСК&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Хороший практический доклад, как вместо DSL порой можно обойтись интерполятором. Какие возможности, плюсы и минусы такого подхода. Можно прямо брать доклад и писать свой интерполятор как по tutorial'у.&lt;/p&gt;
 &lt;p&gt;В качестве домашнего задания для себя запомнил задачу реализовать интерполятор для типобезопасного форматирования строки. Хотим с &lt;a href="http://habrahabr.ru/users/aveic/"&gt;aveic&lt;/a&gt; попробовать независимо друг от друга реализовать это и посмотреть, что получиться.&lt;/p&gt;
 &lt;p&gt;Рекомендую для тех, кто интересуется темой.&lt;/p&gt;
@@ -163,16 +164,17 @@
 &lt;p&gt;Самый звёздный докладчик на конференции. К сожалению без знания хотя бы основ синтаксиса Haskell понять что-то было сложно. Докладчик проводил доклад в потрясающей форме - выдавая как из пулемёта кучу кода на Haskell прями в vim'е.&lt;/p&gt;
 &lt;p&gt;Чтобы понять что к чему, я смотрел на порт этой библиотеки на Scala - &lt;a href="https://github.com/julien-truffaut/Monocle"&gt;Monocle&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;В общих словах – это удобный способ изменения иммутабельных структур с возможностью написания максимально абстрактных маленьких кусочков с дальнейшим комбинированием в более сложные кусочки.&lt;/p&gt;
-&lt;h3&gt;Реактивные потоки в backend-е, Алексей Романчук, 2ГИС&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;Видео к сожалению не выложили.&lt;/em&gt;&lt;/p&gt;
+&lt;h3&gt;&lt;a href="http://www.youtube.com/watch?v=Ev6diAO2FAI"&gt;Реактивные потоки в backend-е, Алексей Романчук, 2ГИС&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Хорошая success story про использование akka streams в production. Для меня теперь это один из ответов на вопрос «где нам нужна akka?».&lt;/p&gt;
 &lt;p&gt;Забавные слайды с цветными "сосиками".&lt;/p&gt;
 &lt;p&gt;Прозвучавшее число потерь на akka streams по сравнению с голыми акторами ~10%.&lt;/p&gt;
 &lt;p&gt;Рекомендую всем, кому интересны akka streams.&lt;/p&gt;
-&lt;h3&gt;Scala performance для сомневающихся, Роман Гребенников, Sociohub.ru&lt;/h3&gt;
+&lt;h3&gt;&lt;a href="http://www.youtube.com/watch?v=__PLkxx6Yko"&gt;Scala performance для сомневающихся, Роман Гребенников, Sociohub.ru&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Самый запомнившийся доклад. Покрывает сразу две темы - пару примеров того как все модные молодёжные FP штуки из scala отражаются в bytecode JVM и машинном коде, какие потери они за собой несут или не несут. А также способы самому развернуть, померить и понять как выполняется тот или иной код.&lt;/p&gt;
 &lt;p&gt;Вкратце про проблемы – простой pattern matching по типу параметра - также быстро как колбаса из if'ов. Есть проблемы с boxing/unboxing в Scala collection и прикладывать &lt;a href="http://www.scala-lang.org/api/2.11.4/index.html#scala.specialized"&gt;@specialized&lt;/a&gt; не поможет.&lt;/p&gt;
 &lt;p&gt;Рекомендую к просмотру.&lt;/p&gt;
 &lt;h3&gt;В общем&lt;/h3&gt;
 &lt;p&gt;Очень приятное послевкусие от конференции, не ожидал, что про FP будет так целостно. Как сказали организаторы было 180 человек.&lt;/p&gt;
-&lt;p&gt;Не посмотрел в живую «Фронтэнд без грусти» Никиты Прокопова, о котором наслышан от коллег, которые видели доклад на какой-то другой конференции. А также хочется поглядеть на «Aрхитектура UI на основе функциональных линз» от Ильи Беда.&lt;/p&gt;
-&lt;p&gt;Буду ждать видео.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Никита Ковалев</dc:creator><pubDate>Mon, 17 Aug 2015 00:00:00 +0300</pubDate><guid>tag:blog.maizy.ru,2015-08-17:posts/fpconf-2015</guid><category>conference</category><category>scala</category></item></channel></rss>
+&lt;p&gt;Не посмотрел в живую &lt;a href="http://www.youtube.com/watch?v=cRWrrHPrk9g"&gt;«Фронтэнд без грусти» Никиты Прокопова&lt;/a&gt;, о котором наслышан от коллег, которые видели доклад на какой-то другой конференции. А также хочется поглядеть на &lt;a href="http://www.youtube.com/watch?v=w8D6Ibo_TDQ"&gt;«Aрхитектура UI на основе функциональных линз» от Ильи Беда&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;s&gt;Буду ждать видео.&lt;/s&gt; Дождались.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Никита Ковалев</dc:creator><pubDate>Mon, 17 Aug 2015 00:00:00 +0300</pubDate><guid>tag:blog.maizy.ru,2015-08-17:posts/fpconf-2015</guid><category>conference</category><category>scala</category></item></channel></rss>
