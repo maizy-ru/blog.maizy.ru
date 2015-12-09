@@ -75,6 +75,39 @@ blog.maizy.ru            </a>
         <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
 
             <article>
+                <h2><a href="http://blog.maizy.ru/posts/scala-days-2015-sf">Видео со ScalaDays 2015 San Francisco</a></h2>
+                    <div class="article-info">
+<footer class="post-info">
+    <div class="published">
+        <time datetime="2015-12-09T00:00:00+03:00"> 09.12.2015</time>
+    </div>
+
+
+
+<div class="tags">
+<i class="fa fa-tags"></i>&nbsp;
+	<a href="http://blog.maizy.ru/tag/scala">scala</a>
+        /
+	<a href="http://blog.maizy.ru/tag/conference">conference</a>
+</div>
+    
+</footer><!-- /.post-info -->                    </div>
+                <div class="summary"><p>Заметки к некоторым видео с главной scala конференции. Все видео и слайды давно доступны на сайте <a href="https://www.parleys.com/channel/scala-days-san-francisco-2015">parleys.com</a>.</p>
+<h3><a href="https://www.parleys.com/tutorial/scala-where-came-from-where-its-going">Scala - where it came from, where it's going - Martin Odersky</a></h3>
+<p>Key note конференции. Советую всем, кто интересуется будущим scala и взглядом на это Мартина. Упоминали новый компилятор dotty, scala.js, scala 2.12. Кстати да, DSL для XML собираются вынести из языка в строковые интерполяторы.</p>
+<h3><a href="https://www.parleys.com/tutorial/akka-http-reactive-web-toolkit">Akka HTTP: the Reactive Web Toolkit - Roland Kuhn</a></h3>
+<p>Про стримы в Akka, с демонстрациями кода. Роланд начинает с соединения TCP со стримами, описывает реализации кастомных протоколов и доходит к тому, как на всём этом реализован HTTP. В ответах на вопросы к докладу упомянуто много планов по развитию стримов и HTTP в akka. Из важного я узнал, что netty внутри play планируют заменить на новый HTTP core.</p>
+<h3><a href="https://www.parleys.com/tutorial/reactive-slick-database-programming">Reactive Slick for Database Programming - Stefan Zeiger</a></h3>
+<p>В начале доклада капитанские вещи о том, какие проблемы есть с БД в асинхронных окружениях и как их принято решать. Затем описывается state и IO монады. Затем объяснятся как slick решает вопросы доступа к БД, представления результатов и зачем там Futures. Интересную мысль, которую я вынес, что при текущей моделе БД асинхронные драйвера, которые стали появляться, не решают проблему, так как внизу БД всё равно работает в синхронном стиле.</p>
+<h3><a href="https://www.parleys.com/tutorial/type-level-programming-scala-101">Type-level Programming in Scala 101 - Joe Barnes</a></h3>
+<p>Весёлая вводная в type-level программирование без углубления в незначительные на первых этапах детали. С примерами кода и тестов. Доклад в режиме ответов на вопросы, которые, к сожалению, не всегда слышно.</p>
+<h3><a href="https://www.parleys.com/tutorial/function-passing-style-new-model-asynchronous-distributed-programming">Function-Passing Style, A New Model for Asynchronous and Distributed Programming - Heather Miller</a></h3>
+<p>Интересный доклад о попытках написать решение, которое в некоторых случаях может использоваться как замена модели акторов. В двух словах идея в том, что стейт может жить в одном месте, а обработка его вызываться из другого, для чего по сети можно передавать лямбды, вместо данных. При этом топология решения может быть любая, как ptp, так и master-slave, например. Если я всё правильно уловил, уже есть работающий прототип.</p>
+                </div>
+                <a class="btn btn-default btn-xs" href="http://blog.maizy.ru/posts/scala-days-2015-sf#comments">прокомментировать</a>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="http://blog.maizy.ru/posts/mt8057-usb-hid-scala">Мониторинг CO2 и работа с USB на scala</a></h2>
                     <div class="article-info">
 <footer class="post-info">
