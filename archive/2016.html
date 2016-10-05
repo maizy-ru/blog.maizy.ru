@@ -2,7 +2,7 @@
 <html lang="ru"
 >
 <head>
-    <title>docker - blog.maizy.ru</title>
+    <title>blog.maizy.ru</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -11,8 +11,7 @@
 
 
 
-    <meta name="author" content="Никита Ковалев" />
-    <meta name="keywords" content="docker" />
+        <meta name="author" content="Никита Ковалев" />
 
     <!-- Open Graph tags -->
         <meta property="og:site_name" content="blog.maizy.ru" />
@@ -74,42 +73,12 @@ blog.maizy.ru            </a>
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
 
-            <article>
-                <h2><a href="http://blog.maizy.ru/posts/ansible-in-docker">Использование ansible в Docker контейнерах</a></h2>
-                    <div class="article-info">
-<footer class="post-info">
-    <div class="published">
-        <time datetime="2015-04-02T00:00:00+03:00"> 02.04.2015</time>
-    </div>
+<h1>Archives for 2016</h1>
 
-
-
-<div class="tags">
-<i class="fa fa-tags"></i>&nbsp;
-	<a href="http://blog.maizy.ru/tag/ansible">ansible</a>
-        /
-	<a href="http://blog.maizy.ru/tag/docker">docker</a>
-</div>
-    
-</footer><!-- /.post-info -->                    </div>
-                <div class="summary"><p>Для решения задачи настройки сервера уже давно придумали много вещей лучше, чем просто bash скрипт. Я в частности, использую <a href="http://docs.ansible.com/index.html">ansible</a>. Но для создания docker контейнеров <a href="https://docs.docker.com/reference/builder/">по прежнему предлагается</a> механизм который не далеко ушёл от bash скриптов.</p>
-<p>Мне понадобилось строить на сервере набор контейнеров, причём полностью автоматизировано. Если создание docker images на основе Dockerfile и работа с готовыми контейнерами в ansible решается из коробки, то с настройкой контейнеров через ansible пришлось немного извратиться.</p>
-<p>Идея простая:</p>
-<ul>
-<li>сделать базовый image в docker в котором через Dockerfile устанавливается только ansible,</li>
-<li>засинхронизировать с локальной машины на хост машину все файлы, нужные для ansible - роли, настройки и таски,</li>
-<li>создать контейнер,</li>
-<li>засинхронизированные настройки подключить в volume внутри контейнера,</li>
-<li>запустить ansible-playbook через docker exec,</li>
-<li>готовые контейнеры при необходимости коммитяться и используются как основа для других контейнеров.</li>
-</ul>
-<p>Плюсы ansible здесь – идемпотентность, готовые модули и возможность использовать некоторые роли, как для хост машин, так и для контейнеров. Например, у меня есть абстрактная роль <code>nginx</code> и отдельная роль поверх неё <code>nginx_container</code> со спецификой для контейнеров.</p>
-<p>То что получилось и подробности работы можно посмотреть в <a href="https://github.com/scala-moscow/deploy">репозитории scala-moscow/deploy</a>.</p>
-                </div>
-                <a class="btn btn-default btn-xs" href="http://blog.maizy.ru/posts/ansible-in-docker#comments">прокомментировать</a>
-            </article>
-            <hr/>
-
+<dl>
+    <dt>05.10.2016</dt>
+    <dd><a href="http://blog.maizy.ru/posts/video-jan-oct-2016">Обзоры видео на технические темы, январь-сентябрь 2016</a></dd>
+</dl>
         </div>
     </div>
 </div>

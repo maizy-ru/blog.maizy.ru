@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru"
+>
+<head>
+    <title>Обзоры видео на технические темы, октябрь 2016 - blog.maizy.ru</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://blog.maizy.ru/posts/video-oct-2016">
+
+        <meta name="author" content="Никита Ковалев" />
+        <meta name="keywords" content="video,scala" />
+        <meta name="description" content="Каждый рабочий день, когда я не ленюсь, у меня есть 15-20 минут на просмотр видео. Читать в этот момент не удобно, так как это отвлекает от процедуры поглощения пищи. Впечатления от видео за последний год в этом посте. В последующем планирую переодически делать такие обзоры. Предыдущие похожий обзор – Видео со ScalaDays 2015 San Francisco. Scala Monads: Declutter Your Code With Monadic Design – Dan Rosen https://www.youtube.com/watch?v=Mw_Jnn_Y5iA общие слова про монады, flatmap и map примеры на scalaz Хороший вывод в конце - монады что-то прячу заменяя это на типы. Option прячет boilerplate от &#34;if non-null&#34; logic, Validation прячет try/catch и т.д. The Multi-threading, Non Blocking IO – Heinz Kabutz https://www.youtube.com/watch?v=uKc0Gx_lPsg Live coding сессия. Объясняется способ написать сервер: блокирующий, неблокирующий на nio, с тредами и селекторами. Интересно. Scalaz: the history, the motivation, the battles, the future – Tony Morris https://www.youtube.com/watch?v=uZd-MvN1n4E Не интересно. Фреймворк Akka и его использование в Яндексе – Вадим Цесько http://www.youtube.com/watch?v=Cc2QtbjUX60 Интересно не сколько про саму akka, там уже некоторые вещи не актуальны для новых версий. Для себя вынес только факт того, что не стоит крутить акторы в системном дефолтном диспечере. Интересно было послушать про систему в общем и узнать, как построена структура обработки данных. Интересно смотреть, как это всё меняется, и меняется ли в связи с akka streams. CRDTs Illustrated – Arnout Engelen https://www.youtube.com/watch?v=9xFfOhasiOE Хороший начальный обзор CRDT с примерами и картинками. Propositions as Types – Philip Wadler https://www.youtube.com/watch?v=IOiZatlZtGU Известный доклад Вадлера. Стоит посмотреть и посмотреть до конца. Вадлер рассказывает об истории развития теоретической базы под разными концепциями, на которых построены языки программирования. Выжимка: все изобретено дважды. Сначала математиками, потом в computer science. Learning scalaz – Eugene Yokota http://www.youtube.com/watch?v=jyMIvcUxOJ0 Очень поверхностный рассказ про scalaz, скорее про проблемы, которые он может решить. В конце – список полезных книг и их обзор. Zipkin at Twitter – Jeff Smick https://engineering.twitter.com/university/videos/zipkin-at-twitter Zipkin – система трассировки логов в распределённых сервисах. Подход интересный, в других системах я такого не видел. Сложилось впечатление, что использовать за пределами твиттер-стека не удобно. Keynote: Scaling Intelligence: moving ideas forward – Jessica Kerr https://skillsmatter.com/skillscasts/6483-keynote-scaling-intelligence-moving-ideas-forward Про кривую изучения scala и community вокруг языка. Про то, как должна выглядеть документация и руководства, чтобы они были понятны людям с разными уровнями понимания computer science и математики, присутствующей в scala. Позиция автора очень релевантна моему представлению о процессе обучения. Optimising Scala for fun and profit – Rory Graves https://skillsmatter.com/skillscasts/6939-optimising-scala-for-fun-and-profit Несколько простых и понятных способов понять, что сделать, чтобы scala работала быстрее. Также про магию, которая лежит за красивыми концепциями в scala, и чего это стоит для производительности." />
+
+        <meta property="og:site_name" content="blog.maizy.ru" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Обзоры видео на технические темы, октябрь 2016"/>
+        <meta property="og:url" content="http://blog.maizy.ru/posts/video-oct-2016"/>
+        <meta property="og:description" content="Каждый рабочий день, когда я не ленюсь, у меня есть 15-20 минут на просмотр видео. Читать в этот момент не удобно, так как это отвлекает от процедуры поглощения пищи. Впечатления от видео за последний год в этом посте. В последующем планирую переодически делать такие обзоры. Предыдущие похожий обзор – Видео со ScalaDays 2015 San Francisco. Scala Monads: Declutter Your Code With Monadic Design – Dan Rosen https://www.youtube.com/watch?v=Mw_Jnn_Y5iA общие слова про монады, flatmap и map примеры на scalaz Хороший вывод в конце - монады что-то прячу заменяя это на типы. Option прячет boilerplate от &#34;if non-null&#34; logic, Validation прячет try/catch и т.д. The Multi-threading, Non Blocking IO – Heinz Kabutz https://www.youtube.com/watch?v=uKc0Gx_lPsg Live coding сессия. Объясняется способ написать сервер: блокирующий, неблокирующий на nio, с тредами и селекторами. Интересно. Scalaz: the history, the motivation, the battles, the future – Tony Morris https://www.youtube.com/watch?v=uZd-MvN1n4E Не интересно. Фреймворк Akka и его использование в Яндексе – Вадим Цесько http://www.youtube.com/watch?v=Cc2QtbjUX60 Интересно не сколько про саму akka, там уже некоторые вещи не актуальны для новых версий. Для себя вынес только факт того, что не стоит крутить акторы в системном дефолтном диспечере. Интересно было послушать про систему в общем и узнать, как построена структура обработки данных. Интересно смотреть, как это всё меняется, и меняется ли в связи с akka streams. CRDTs Illustrated – Arnout Engelen https://www.youtube.com/watch?v=9xFfOhasiOE Хороший начальный обзор CRDT с примерами и картинками. Propositions as Types – Philip Wadler https://www.youtube.com/watch?v=IOiZatlZtGU Известный доклад Вадлера. Стоит посмотреть и посмотреть до конца. Вадлер рассказывает об истории развития теоретической базы под разными концепциями, на которых построены языки программирования. Выжимка: все изобретено дважды. Сначала математиками, потом в computer science. Learning scalaz – Eugene Yokota http://www.youtube.com/watch?v=jyMIvcUxOJ0 Очень поверхностный рассказ про scalaz, скорее про проблемы, которые он может решить. В конце – список полезных книг и их обзор. Zipkin at Twitter – Jeff Smick https://engineering.twitter.com/university/videos/zipkin-at-twitter Zipkin – система трассировки логов в распределённых сервисах. Подход интересный, в других системах я такого не видел. Сложилось впечатление, что использовать за пределами твиттер-стека не удобно. Keynote: Scaling Intelligence: moving ideas forward – Jessica Kerr https://skillsmatter.com/skillscasts/6483-keynote-scaling-intelligence-moving-ideas-forward Про кривую изучения scala и community вокруг языка. Про то, как должна выглядеть документация и руководства, чтобы они были понятны людям с разными уровнями понимания computer science и математики, присутствующей в scala. Позиция автора очень релевантна моему представлению о процессе обучения. Optimising Scala for fun and profit – Rory Graves https://skillsmatter.com/skillscasts/6939-optimising-scala-for-fun-and-profit Несколько простых и понятных способов понять, что сделать, чтобы scala работала быстрее. Также про магию, которая лежит за красивыми концепциями в scala, и чего это стоит для производительности."/>
+        <meta property="article:published_time" content="2016-10-04" />
+            <meta property="article:section" content="Tech" />
+            <meta property="article:tag" content="video" />
+            <meta property="article:tag" content="scala" />
+            <meta property="article:author" content="Никита Ковалев" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
+    <link href="http://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/style.css" type="text/css"/>
+        <link href="http://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
+
+        <link href="http://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
+              title="blog.maizy.ru"/>
+        <link href="http://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
+              title="blog.maizy.ru"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.maizy.ru/" class="navbar-brand">
+blog.maizy.ru            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                        <li >
+                            <a href="http://blog.maizy.ru/life">Life</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.maizy.ru/">Tech</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
+              <li><a href="http://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
+              <li><a href="http://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
+
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.maizy.ru/posts/video-oct-2016"
+                       rel="bookmark"
+                       title="Permalink to Обзоры видео на технические темы, октябрь 2016">
+                        Обзоры видео на технические темы, октябрь 2016
+                    </a>
+                </h1>
+                <div class="article-info">
+<footer class="post-info">
+    <div class="published">
+        <time datetime="2016-10-04T00:00:00+03:00"> 04.10.2016</time>
+    </div>
+
+
+
+<div class="tags">
+<i class="fa fa-tags"></i>&nbsp;
+	<a href="http://blog.maizy.ru/tag/video">video</a>
+        /
+	<a href="http://blog.maizy.ru/tag/scala">scala</a>
+</div>
+    
+</footer><!-- /.post-info -->                </div>
+            </header>
+            <div class="entry-content">
+                <p>Каждый рабочий день, когда я не ленюсь, у меня есть 15-20 минут на просмотр видео. Читать в этот момент не удобно, так как это отвлекает от процедуры поглощения пищи.</p>
+<p>Впечатления от видео за последний год в этом посте. В последующем планирую переодически делать такие обзоры.</p>
+<p>Предыдущие похожий обзор – <a href="http://blog.maizy.ru/posts/scala-days-2015-sf">Видео со ScalaDays 2015 San Francisco</a>.</p>
+<h3>Scala Monads: Declutter Your Code With Monadic Design – Dan Rosen</h3>
+<p>https://www.youtube.com/watch?v=Mw_Jnn_Y5iA</p>
+<ul>
+<li>общие слова про монады, flatmap и map</li>
+<li>примеры на scalaz</li>
+<li>Хороший вывод в конце - монады что-то прячу заменяя это на типы. Option прячет boilerplate от "if non-null" logic, Validation прячет try/catch и т.д.</li>
+</ul>
+<h3>The Multi-threading, Non Blocking IO – Heinz Kabutz</h3>
+<p>https://www.youtube.com/watch?v=uKc0Gx_lPsg</p>
+<p>Live coding сессия. Объясняется способ написать сервер: блокирующий, неблокирующий на nio, с тредами и селекторами. Интересно.</p>
+<h3>Scalaz: the history, the motivation, the battles, the future – Tony Morris</h3>
+<p>https://www.youtube.com/watch?v=uZd-MvN1n4E</p>
+<p>Не интересно.</p>
+<h3>Фреймворк Akka и его использование в Яндексе – Вадим Цесько</h3>
+<p>http://www.youtube.com/watch?v=Cc2QtbjUX60</p>
+<ul>
+<li>Интересно не сколько про саму akka, там уже некоторые вещи не актуальны для новых версий. Для себя вынес только факт того, что не стоит крутить акторы в системном дефолтном диспечере.</li>
+<li>Интересно было послушать про систему в общем и узнать, как построена структура обработки данных.</li>
+<li>Интересно смотреть, как это всё меняется, и меняется ли в связи с akka streams.</li>
+</ul>
+<h3>CRDTs Illustrated – Arnout Engelen</h3>
+<p>https://www.youtube.com/watch?v=9xFfOhasiOE</p>
+<p>Хороший начальный обзор CRDT с примерами и картинками.</p>
+<h3>Propositions as Types – Philip Wadler</h3>
+<p>https://www.youtube.com/watch?v=IOiZatlZtGU</p>
+<ul>
+<li>Известный доклад Вадлера. Стоит посмотреть и посмотреть до конца.</li>
+<li>Вадлер рассказывает об истории развития теоретической базы под разными концепциями, на которых построены языки программирования.</li>
+<li>Выжимка: все изобретено дважды. Сначала математиками, потом в computer science.</li>
+</ul>
+<h3>Learning scalaz – Eugene Yokota</h3>
+<p>http://www.youtube.com/watch?v=jyMIvcUxOJ0</p>
+<ul>
+<li>Очень поверхностный рассказ про scalaz, скорее про проблемы, которые он может решить.</li>
+<li>В конце – список полезных книг и их обзор.</li>
+</ul>
+<h3>Zipkin at Twitter – Jeff Smick</h3>
+<p>https://engineering.twitter.com/university/videos/zipkin-at-twitter</p>
+<p>Zipkin – система трассировки логов в распределённых сервисах.</p>
+<ul>
+<li>Подход интересный, в других системах я такого не видел.</li>
+<li>Сложилось впечатление, что использовать за пределами твиттер-стека не удобно.</li>
+</ul>
+<h3>Keynote: Scaling Intelligence: moving ideas forward – Jessica Kerr</h3>
+<p>https://skillsmatter.com/skillscasts/6483-keynote-scaling-intelligence-moving-ideas-forward</p>
+<p>Про кривую изучения scala и community вокруг языка. Про то, как должна выглядеть документация и руководства, чтобы они были понятны людям с разными уровнями понимания computer science и математики, присутствующей в scala.</p>
+<p>Позиция автора очень релевантна моему представлению о процессе обучения.</p>
+<h3>Optimising Scala for fun and profit – Rory Graves</h3>
+<p>https://skillsmatter.com/skillscasts/6939-optimising-scala-for-fun-and-profit</p>
+<p>Несколько простых и понятных способов понять, что сделать, чтобы scala работала быстрее. Также про магию, которая лежит за красивыми концепциями в scala, и чего это стоит для производительности.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'blogmaizyru'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'video-oct-2016';
+                var disqus_url = 'http://blog.maizy.ru/posts/video-oct-2016';
+
+            var disqus_config = function () {
+                this.language = "ru";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row footnotes">
+         <div class="col-xs-10">&copy; 2015-2016 Никита Ковалев
+            &middot; Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
+            &middot; Theme <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>.         </div>
+        <div class="col-xs-2">
+          <p class="pull-right">
+            <i class="fa fa-rss"></i>
+            <a href="http://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
+          </p>
+        </div>
+      </div>
+   </div>
+</footer>
+<script src="http://blog.maizy.ru/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.maizy.ru/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'blogmaizyru'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-392618-8', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+</body>
+</html>
