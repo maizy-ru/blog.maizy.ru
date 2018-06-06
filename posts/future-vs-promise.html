@@ -10,7 +10,7 @@
 
 
 
-<link rel="canonical" href="http://blog.maizy.ru/posts/future-vs-promise">
+<link rel="canonical" href="https://blog.maizy.ru/posts/future-vs-promise">
 
         <meta name="author" content="Никита Ковалев" />
         <meta name="keywords" content="async" />
@@ -19,7 +19,7 @@
         <meta property="og:site_name" content="blog.maizy.ru" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Отличие Future от Promise"/>
-        <meta property="og:url" content="http://blog.maizy.ru/posts/future-vs-promise"/>
+        <meta property="og:url" content="https://blog.maizy.ru/posts/future-vs-promise"/>
         <meta property="og:description" content="Недавно пытался на пальцах объяснить отличие Future от Promise. Понятия эти очень близкие, даже статья на Wikipedia про них одна. Как правило Future и Promise используются как контейнер, для представления данных, которых пока нет, но уже можно сформировать цепочку их обработки. Реализации, которые мне известны: Deffered в Twisted, Future в python 3, его примитивный backport в tornado и Deffered в jQuery. Мне нравится такое определение разницы: Future – это контейнер, на результат которого вы подписываетесь, но не управляете его появлением. Promise – это контейнер, результат в который вы предоставляете и сами управляете его появлением в будущем. Условно можно считать Future &#34;переменной&#34;, а Promise &#34;функцией по установке переменной&#34;. Логично, что во многих реализациях эти объекты порождаются парами. Иногда даже эти понятия смешивают в один контейнер, который предоставляет реализации обоих задач, например, так сделано в jQuery и python. Но даже, если реализация смешана, полезно каким-либо образом, хотя бы в соглашениях понимать имеете ли вы право &#34;зажечь&#34; контейнер или имеете право только подписываться на него. За Future не нужно следить и можно считать, что код который их вернул обязательно когда-нибудь вызовет ваши callback&#39;и. За Promise же вы ответственны и должны не забыть вызвать его в любом случае, даже если ваш код упал с какой-то ожидаемой или не ожидаемой ошибкой."/>
         <meta property="article:published_time" content="2015-04-13" />
             <meta property="article:section" content="Tech" />
@@ -28,16 +28,16 @@
 
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
-    <link href="http://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
+    <link href="https://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="http://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/style.css" type="text/css"/>
-        <link href="http://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
+    <link href="https://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
 
-        <link href="http://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
               title="blog.maizy.ru"/>
-        <link href="http://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
               title="blog.maizy.ru"/>
 
 </head>
@@ -52,22 +52,22 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="http://blog.maizy.ru/" class="navbar-brand">
+            <a href="https://blog.maizy.ru/" class="navbar-brand">
 blog.maizy.ru            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
                         <li >
-                            <a href="http://blog.maizy.ru/life">Life</a>
+                            <a href="https://blog.maizy.ru/life">Life</a>
                         </li>
                         <li class="active">
-                            <a href="http://blog.maizy.ru/">Tech</a>
+                            <a href="https://blog.maizy.ru/">Tech</a>
                         </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="http://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
-              <li><a href="http://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
-              <li><a href="http://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
+              <li><a href="https://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
+              <li><a href="https://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
+              <li><a href="https://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -83,7 +83,7 @@ blog.maizy.ru            </a>
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://blog.maizy.ru/posts/future-vs-promise"
+                    <a href="https://blog.maizy.ru/posts/future-vs-promise"
                        rel="bookmark"
                        title="Permalink to Отличие Future от Promise">
                         Отличие Future от Promise
@@ -99,9 +99,9 @@ blog.maizy.ru            </a>
 
 <div class="tags">
 <i class="fa fa-tags"></i>&nbsp;
-	<a href="http://blog.maizy.ru/tag/async">async</a>
+	<a href="https://blog.maizy.ru/tag/async">async</a>
 </div>
-    
+
 </footer><!-- /.post-info -->                </div>
             </header>
             <div class="entry-content">
@@ -124,7 +124,7 @@ blog.maizy.ru            </a>
             var disqus_shortname = 'blogmaizyru'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'future-vs-promise';
-                var disqus_url = 'http://blog.maizy.ru/posts/future-vs-promise';
+                var disqus_url = 'https://blog.maizy.ru/posts/future-vs-promise';
 
             var disqus_config = function () {
                 this.language = "ru";
@@ -160,19 +160,19 @@ blog.maizy.ru            </a>
         <div class="col-xs-2">
           <p class="pull-right">
             <i class="fa fa-rss"></i>
-            <a href="http://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
+            <a href="https://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
           </p>
         </div>
       </div>
    </div>
 </footer>
-<script src="http://blog.maizy.ru/theme/js/jquery.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/jquery.min.js"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="http://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
 
 <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="http://blog.maizy.ru/theme/js/respond.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/respond.min.js"></script>
 
     <!-- Disqus -->
     <script type="text/javascript">

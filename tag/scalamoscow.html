@@ -18,21 +18,21 @@
         <meta property="og:site_name" content="blog.maizy.ru" />
         <meta property="og:type" content="website"/>
         <meta property="og:title" content="blog.maizy.ru"/>
-        <meta property="og:url" content="http://blog.maizy.ru"/>
+        <meta property="og:url" content="https://blog.maizy.ru"/>
         <meta property="og:description" content="blog.maizy.ru"/>
 
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
-    <link href="http://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
+    <link href="https://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="http://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/style.css" type="text/css"/>
-        <link href="http://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
+    <link href="https://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
 
-        <link href="http://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
               title="blog.maizy.ru"/>
-        <link href="http://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
               title="blog.maizy.ru"/>
 
 </head>
@@ -47,22 +47,22 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="http://blog.maizy.ru/" class="navbar-brand">
+            <a href="https://blog.maizy.ru/" class="navbar-brand">
 blog.maizy.ru            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
                         <li >
-                            <a href="http://blog.maizy.ru/life">Life</a>
+                            <a href="https://blog.maizy.ru/life">Life</a>
                         </li>
                         <li >
-                            <a href="http://blog.maizy.ru/">Tech</a>
+                            <a href="https://blog.maizy.ru/">Tech</a>
                         </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="http://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
-              <li><a href="http://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
-              <li><a href="http://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
+              <li><a href="https://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
+              <li><a href="https://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
+              <li><a href="https://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -75,7 +75,7 @@ blog.maizy.ru            </a>
         <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
 
             <article>
-                <h2><a href="http://blog.maizy.ru/posts/handlerbars-templates-in-scala">Шаблонизация с handlebars и json4s на scala</a></h2>
+                <h2><a href="https://blog.maizy.ru/posts/handlerbars-templates-in-scala">Шаблонизация с handlebars и json4s на scala</a></h2>
                     <div class="article-info">
 <footer class="post-info">
     <div class="published">
@@ -86,11 +86,11 @@ blog.maizy.ru            </a>
 
 <div class="tags">
 <i class="fa fa-tags"></i>&nbsp;
-	<a href="http://blog.maizy.ru/tag/scala">scala</a>
+	<a href="https://blog.maizy.ru/tag/scala">scala</a>
         /
-	<a href="http://blog.maizy.ru/tag/scalamoscow">scala.moscow</a>
+	<a href="https://blog.maizy.ru/tag/scalamoscow">scala.moscow</a>
 </div>
-    
+
 </footer><!-- /.post-info -->                    </div>
                 <div class="summary"><p>Занимаюсь неспешно своим проектом <a href="https://github.com/scala-moscow/">scala.moscow</a>. Одна из задач – примитивный генератор статических сайтов. Очень хотелось чего-то простого для шаблонизации. Думал взять mustache, но оказалось, что это уже не совсем модно-молодёжно, так как есть его расширения handlebars и hogan.</p>
 <p>Handlebars мне больше приглянулся. Для scala есть нативная реализация на парсер комбинаторах
@@ -118,7 +118,7 @@ blog.maizy.ru            </a>
 <p>Плюс к этому handlebars и задумывался для комбинации с JSON, что отражается в его синтаксисе. Плюс к этому сразу решается вопрос, где хранить статические данные, которые не нужно генерить программно –  в JSON файлах. В json4s конечно есть не только DSL, но и парсеры на основе нативной scala реализации и jackson.</p>
 <p>Чтобы подружить handlebars.java и json4s DSL, написал <a href="https://github.com/scala-moscow/scala.moscow/blob/master/site-generator/src/main/scala/moscow/scala/sitegen/utils/template/JValueResolver.scala">ValueResolver</a>, идею и часть реализации подсмотрел у <a href="https://github.com/mfirry/handlebars-json4s/">handlebars-json4s</a>, но доработал её, решил часть проблем и дописал тестов. Как решу <a href="https://github.com/scala-moscow/scala.moscow/blob/4d31fad70f7bccd8097de21637f820375af41b52/site-generator/src/test/scala/moscow/scala/sitegen/tests/utils/template/JValueResolverSpec.scala#L86-L93">оставшиеся проблемы</a> планирую сделать отдельный артефакт.</p>
                 </div>
-                <a class="btn btn-default btn-xs" href="http://blog.maizy.ru/posts/handlerbars-templates-in-scala#comments">прокомментировать</a>
+                <a class="btn btn-default btn-xs" href="https://blog.maizy.ru/posts/handlerbars-templates-in-scala#comments">прокомментировать</a>
             </article>
             <hr/>
 
@@ -135,19 +135,19 @@ blog.maizy.ru            </a>
         <div class="col-xs-2">
           <p class="pull-right">
             <i class="fa fa-rss"></i>
-            <a href="http://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
+            <a href="https://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
           </p>
         </div>
       </div>
    </div>
 </footer>
-<script src="http://blog.maizy.ru/theme/js/jquery.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/jquery.min.js"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="http://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
 
 <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="http://blog.maizy.ru/theme/js/respond.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/respond.min.js"></script>
 
     <!-- Disqus -->
     <script type="text/javascript">

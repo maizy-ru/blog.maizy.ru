@@ -10,7 +10,7 @@
 
 
 
-<link rel="canonical" href="http://blog.maizy.ru/posts/scala-days-2015-sf">
+<link rel="canonical" href="https://blog.maizy.ru/posts/scala-days-2015-sf">
 
         <meta name="author" content="Никита Ковалев" />
         <meta name="keywords" content="scala,conference" />
@@ -19,7 +19,7 @@
         <meta property="og:site_name" content="blog.maizy.ru" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Видео со ScalaDays 2015 San Francisco"/>
-        <meta property="og:url" content="http://blog.maizy.ru/posts/scala-days-2015-sf"/>
+        <meta property="og:url" content="https://blog.maizy.ru/posts/scala-days-2015-sf"/>
         <meta property="og:description" content="Заметки к некоторым видео с главной scala конференции. Все видео и слайды давно доступны на сайте parleys.com. Scala - where it came from, where it&#39;s going - Martin Odersky Key note конференции. Советую всем, кто интересуется будущим scala и взглядом на это Мартина. Упоминали новый компилятор dotty, scala.js, scala 2.12. Кстати да, DSL для XML собираются вынести из языка в строковые интерполяторы. Akka HTTP: the Reactive Web Toolkit - Roland Kuhn Про стримы в Akka, с демонстрациями кода. Роланд начинает с соединения TCP со стримами, описывает реализации кастомных протоколов и доходит к тому, как на всём этом реализован HTTP. В ответах на вопросы к докладу упомянуто много планов по развитию стримов и HTTP в akka. Из важного я узнал, что netty внутри play планируют заменить на новый HTTP core. Reactive Slick for Database Programming - Stefan Zeiger В начале доклада капитанские вещи о том, какие проблемы есть с БД в асинхронных окружениях и как их принято решать. Затем описывается state и IO монады. Затем объяснятся как slick решает вопросы доступа к БД, представления результатов и зачем там Futures. Интересную мысль, которую я вынес, что при текущей моделе БД асинхронные драйвера, которые стали появляться, не решают проблему, так как внизу БД всё равно работает в синхронном стиле. Type-level Programming in Scala 101 - Joe Barnes Весёлая вводная в type-level программирование без углубления в незначительные на первых этапах детали. С примерами кода и тестов. Доклад в режиме ответов на вопросы, которые, к сожалению, не всегда слышно. Function-Passing Style, A New Model for Asynchronous and Distributed Programming - Heather Miller Интересный доклад о попытках написать решение, которое в некоторых случаях может использоваться как замена модели акторов. В двух словах идея в том, что стейт может жить в одном месте, а обработка его вызываться из другого, для чего по сети можно передавать лямбды, вместо данных. При этом топология решения может быть любая, как ptp, так и master-slave, например. Если я всё правильно уловил, уже есть работающий прототип."/>
         <meta property="article:published_time" content="2015-12-09" />
             <meta property="article:section" content="Tech" />
@@ -29,16 +29,16 @@
 
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
-    <link href="http://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
+    <link href="https://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="http://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/style.css" type="text/css"/>
-        <link href="http://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
+    <link href="https://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
 
-        <link href="http://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
               title="blog.maizy.ru"/>
-        <link href="http://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
               title="blog.maizy.ru"/>
 
 </head>
@@ -53,22 +53,22 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="http://blog.maizy.ru/" class="navbar-brand">
+            <a href="https://blog.maizy.ru/" class="navbar-brand">
 blog.maizy.ru            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
                         <li >
-                            <a href="http://blog.maizy.ru/life">Life</a>
+                            <a href="https://blog.maizy.ru/life">Life</a>
                         </li>
                         <li class="active">
-                            <a href="http://blog.maizy.ru/">Tech</a>
+                            <a href="https://blog.maizy.ru/">Tech</a>
                         </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="http://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
-              <li><a href="http://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
-              <li><a href="http://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
+              <li><a href="https://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
+              <li><a href="https://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
+              <li><a href="https://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -84,7 +84,7 @@ blog.maizy.ru            </a>
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://blog.maizy.ru/posts/scala-days-2015-sf"
+                    <a href="https://blog.maizy.ru/posts/scala-days-2015-sf"
                        rel="bookmark"
                        title="Permalink to Видео со ScalaDays 2015 San Francisco">
                         Видео со ScalaDays 2015 San Francisco
@@ -100,11 +100,11 @@ blog.maizy.ru            </a>
 
 <div class="tags">
 <i class="fa fa-tags"></i>&nbsp;
-	<a href="http://blog.maizy.ru/tag/scala">scala</a>
+	<a href="https://blog.maizy.ru/tag/scala">scala</a>
         /
-	<a href="http://blog.maizy.ru/tag/conference">conference</a>
+	<a href="https://blog.maizy.ru/tag/conference">conference</a>
 </div>
-    
+
 </footer><!-- /.post-info -->                </div>
             </header>
             <div class="entry-content">
@@ -131,7 +131,7 @@ blog.maizy.ru            </a>
             var disqus_shortname = 'blogmaizyru'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'scala-days-2015-sf';
-                var disqus_url = 'http://blog.maizy.ru/posts/scala-days-2015-sf';
+                var disqus_url = 'https://blog.maizy.ru/posts/scala-days-2015-sf';
 
             var disqus_config = function () {
                 this.language = "ru";
@@ -167,19 +167,19 @@ blog.maizy.ru            </a>
         <div class="col-xs-2">
           <p class="pull-right">
             <i class="fa fa-rss"></i>
-            <a href="http://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
+            <a href="https://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
           </p>
         </div>
       </div>
    </div>
 </footer>
-<script src="http://blog.maizy.ru/theme/js/jquery.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/jquery.min.js"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="http://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
 
 <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="http://blog.maizy.ru/theme/js/respond.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/respond.min.js"></script>
 
     <!-- Disqus -->
     <script type="text/javascript">

@@ -10,7 +10,7 @@
 
 
 
-<link rel="canonical" href="http://blog.maizy.ru/posts/akka-cluster-testing">
+<link rel="canonical" href="https://blog.maizy.ru/posts/akka-cluster-testing">
 
         <meta name="author" content="Никита Ковалев" />
         <meta name="keywords" content="akka,scala" />
@@ -19,7 +19,7 @@
         <meta property="og:site_name" content="blog.maizy.ru" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Akka. Тестирование в общем и про тестирование кластера в частности"/>
-        <meta property="og:url" content="http://blog.maizy.ru/posts/akka-cluster-testing"/>
+        <meta property="og:url" content="https://blog.maizy.ru/posts/akka-cluster-testing"/>
         <meta property="og:description" content="Продолжая заниматься hello world&#39;ом на akka погрузился в вопрос тестирования акторов. Общие вещи просты, не вижу смысла пересказывать документацию, остановлюсь только на ключевых моментах и выводах. Асинхронное vs синхронное тестирование Есть два подхода синхронное и асинхронное тестирование. Первое в реальной жизни почти никогда не нужно, если только не хочется протестировать какие-то уж совсем внутренние кишки актора. В остальных случаях, лучше тестировать честно, отправляя и принимая ответы от акторов. TestProbe и TestActor Часть которую важно понимать. Сначала я думал, что при тестировании будет какая-то чёрная магия, которая позволит мне получать сообщения, летающие между разными акторами. На деле всё проще. Внутри вашего TestCase создаётся TestProbe и TestActor, которые затем используются для запросов к акторам и анализа приходящих результатов. К сожалению, в документации сразу показывается пример с trait ImplicitSender, который слегка &#34;гримирует&#34; наличие testActor, что вызвало по началу повышенное количество wtf-per-line. Соответственно набор стандартных assert&#39;ов на самом деле вызывается у стандартного TestProbe. Конечно же таких TestProbe можно даже создать несколько и, например, поместить в них дополнительные специфичные вам assert&#39;ы. Отсюда же вывод, что для тестирования parent-child взаимодействия придётся вставлять между ними тестовый актор с проксированием сообщений, в документации описаны способы сделать это. В любом случае production код нужно немного к такому подготовить, другой вопрос, что изменения полезны и для других целей. Cluster testing С тестированием кластерных конфигурацию всё не так тривиально. Для начала есть решение multi-jvm тестирования с плагином для sbt, в документации к akka описано как это всё подружить с тестами, чтобы получить Multi Node Testing. Пригодится и для других задач, когда используется просто akka remote. Печалит, что нужно серьёзно &#34;испортить&#34; конфиг sbt, но, наверное, можно решить выносом таких тестов в отдельный sbt проект. Также ваша IntelliJ IDEA по понятным причинам про такие тесты ничего знать не будет, так как всё магия работает только в связке с sbt. Думаю, в ScalaIDE будет аналогично. Простого способа дебажить это тоже нет. Логи не очень удобны, так как валяться в параллель со всех JVM. В идеале нужно писать обёртки, которые будут собирать их по каждой ноде отдельно. &#34;... напоминает мне игру: &#34;Что? Где? Когда?&#34; называется! Непонятно, что где валяется и когда все это кончится!&#34; Общерекомендуемый подход писать multi-jvm тесты в одном классе, который будет одинаково выполняться на всех нодах. Это обязывает постоянно следить за тем какой код и где исполняется. Например, написанный в лоб assert будет выполнен на всех нодах, часть из которых может быть ещё не присоединена к кластеру. Постоянно об это спотыкался, но потом написал себе пару удобных утилиток: import scala.collection.mutable import org.scalatest.{ BeforeAndAfterAll, Matchers, Suite } import akka.cluster.Cluster import akka.cluster.ClusterEvent.{ CurrentClusterState, MemberUp } import akka.remote.testconductor.RoleName import akka.remote.testkit.{ MultiNodeSpec, MultiNodeConfig, MultiNodeSpecCallbacks } import akka.testkit.ImplicitSender abstract class MultiNodeBaseSpec(config: MultiNodeConfig) extends MultiNodeSpec(config) with Suite with BeforeAndAfterAll with MultiNodeSpecCallbacks with ImplicitSender with Matchers { override def beforeAll() = { super.beforeAll() multiNodeSpecBeforeAll() } override def afterAll() = { enterBarrier(&#34;before-clean-up&#34;) cleanUp() enterBarrier(&#34;clean-up&#34;) multiNodeSpecAfterAll() super.afterAll() } def cluster: Cluster = Cluster(system) cluster.subscribe(testActor, classOf[MemberUp]) expectMsgClass(classOf[CurrentClusterState]) println(s&#34;myself address: ${node(myself).address}, role: ${myself.name}&#34;) val currentClusterNodes = mutable.Set[RoleName]() def joinToCluster(nodes: Seq[RoleName], seedNode: RoleName): Unit = { currentClusterNodes ++= nodes // on new nodes await events for all cluster member runOn(nodes: _*) { cluster join node(seedNode).address (receiveN(currentClusterNodes.size).collect { case MemberUp(member) =&gt; member.address }.toSet should contain theSameElementsAs currentClusterNodes.map(node(_).address).toSet) } // on existing nodes await events for only new cluster members runOn((currentClusterNodes -- nodes.toSet).toList: _*) { (receiveN(nodes.size).collect { case MemberUp(member) =&gt; member.address }.toSet should contain theSameElementsAs nodes.map(node(_).address).toSet) } enterBarrier(&#34;join-&#34;+ nodes.map(_.name).mkString(&#34;,&#34;)) } def runOnJoinedNodes(a: =&gt; Unit): Unit = runOn(currentClusterNodes.toList: _*) { a } def cleanUp(): Unit = cluster.unsubscribe(testActor) } В базовом spec&#39;е выше реализовано: подписывание на события кластера метод joinToCluster для правильного присоединения к кластеру нод метод runOnJoinedNodes для выполнения кода на уже работающих нодах кластера, аналогичный по использованию встроенному runOn Тестирование сети Есть встроенная поддержка тестирования транспорта и сети с возможностью эмуляции проблем между нодами (blackhole). При этом я надеюсь как-нибудь попробовать приспособить docker, его API и iptables для данных целей, благо multi-jvm, кажется умеет сам в тестах упаковывать тестовую ноду в jar, раскладывать через ssh+rsync, а затем запускать. Примеры Можно глянуть, что получилось у меня. Много полезных примеров я обнаружил в самих исходниках akka и в проекте akka crdt. Вывод Тестировать akka, даже в сложных конфигурациях можно и нужно, но tooling ещё требует доработки."/>
         <meta property="article:published_time" content="2015-09-21" />
             <meta property="article:section" content="Tech" />
@@ -29,16 +29,16 @@
 
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
-    <link href="http://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
+    <link href="https://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="http://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/style.css" type="text/css"/>
-        <link href="http://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
+    <link href="https://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
 
-        <link href="http://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
               title="blog.maizy.ru"/>
-        <link href="http://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
               title="blog.maizy.ru"/>
 
 </head>
@@ -53,22 +53,22 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="http://blog.maizy.ru/" class="navbar-brand">
+            <a href="https://blog.maizy.ru/" class="navbar-brand">
 blog.maizy.ru            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
                         <li >
-                            <a href="http://blog.maizy.ru/life">Life</a>
+                            <a href="https://blog.maizy.ru/life">Life</a>
                         </li>
                         <li class="active">
-                            <a href="http://blog.maizy.ru/">Tech</a>
+                            <a href="https://blog.maizy.ru/">Tech</a>
                         </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="http://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
-              <li><a href="http://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
-              <li><a href="http://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
+              <li><a href="https://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
+              <li><a href="https://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
+              <li><a href="https://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -84,7 +84,7 @@ blog.maizy.ru            </a>
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://blog.maizy.ru/posts/akka-cluster-testing"
+                    <a href="https://blog.maizy.ru/posts/akka-cluster-testing"
                        rel="bookmark"
                        title="Permalink to Akka. Тестирование в общем и про тестирование кластера в частности">
                         Akka. Тестирование в общем и про тестирование кластера в частности
@@ -100,11 +100,11 @@ blog.maizy.ru            </a>
 
 <div class="tags">
 <i class="fa fa-tags"></i>&nbsp;
-	<a href="http://blog.maizy.ru/tag/akka">akka</a>
+	<a href="https://blog.maizy.ru/tag/akka">akka</a>
         /
-	<a href="http://blog.maizy.ru/tag/scala">scala</a>
+	<a href="https://blog.maizy.ru/tag/scala">scala</a>
 </div>
-    
+
 </footer><!-- /.post-info -->                </div>
             </header>
             <div class="entry-content">
@@ -217,7 +217,7 @@ blog.maizy.ru            </a>
             var disqus_shortname = 'blogmaizyru'; // required: replace example with your forum shortname
 
                     var disqus_identifier = 'akka-cluster-testing';
-                var disqus_url = 'http://blog.maizy.ru/posts/akka-cluster-testing';
+                var disqus_url = 'https://blog.maizy.ru/posts/akka-cluster-testing';
 
             var disqus_config = function () {
                 this.language = "ru";
@@ -253,19 +253,19 @@ blog.maizy.ru            </a>
         <div class="col-xs-2">
           <p class="pull-right">
             <i class="fa fa-rss"></i>
-            <a href="http://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
+            <a href="https://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
           </p>
         </div>
       </div>
    </div>
 </footer>
-<script src="http://blog.maizy.ru/theme/js/jquery.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/jquery.min.js"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="http://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
 
 <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="http://blog.maizy.ru/theme/js/respond.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/respond.min.js"></script>
 
     <!-- Disqus -->
     <script type="text/javascript">

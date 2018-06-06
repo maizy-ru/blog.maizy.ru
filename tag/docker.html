@@ -18,21 +18,21 @@
         <meta property="og:site_name" content="blog.maizy.ru" />
         <meta property="og:type" content="website"/>
         <meta property="og:title" content="blog.maizy.ru"/>
-        <meta property="og:url" content="http://blog.maizy.ru"/>
+        <meta property="og:url" content="https://blog.maizy.ru"/>
         <meta property="og:description" content="blog.maizy.ru"/>
 
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
-    <link href="http://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/bootstrap.yeti.min.css" type="text/css"/>
+    <link href="https://blog.maizy.ru/theme/css/font-awesome.min.css" rel="stylesheet">
 
-    <link href="http://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://blog.maizy.ru/theme/css/style.css" type="text/css"/>
-        <link href="http://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
+    <link href="https://blog.maizy.ru/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.maizy.ru/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.maizy.ru/static/css/custom.css" rel="stylesheet">
 
-        <link href="http://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/atom.xml" type="application/atom+xml" rel="alternate"
               title="blog.maizy.ru"/>
-        <link href="http://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
+        <link href="https://blog.maizy.ru/feeds/category/tech/rss.xml" type="application/rss+xml" rel="alternate"
               title="blog.maizy.ru"/>
 
 </head>
@@ -47,22 +47,22 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="http://blog.maizy.ru/" class="navbar-brand">
+            <a href="https://blog.maizy.ru/" class="navbar-brand">
 blog.maizy.ru            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
                         <li >
-                            <a href="http://blog.maizy.ru/life">Life</a>
+                            <a href="https://blog.maizy.ru/life">Life</a>
                         </li>
                         <li >
-                            <a href="http://blog.maizy.ru/">Tech</a>
+                            <a href="https://blog.maizy.ru/">Tech</a>
                         </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="http://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
-              <li><a href="http://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
-              <li><a href="http://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
+              <li><a href="https://blog.maizy.ru/archives"><i class="fa fa-th-list"></i><span class="icon-label">Архив</span></a></li>
+              <li><a href="https://blog.maizy.ru/feeds/category/tech/rss.xml"><i class="fa fa-rss"></i><span class="icon-label">RSS</span></a></li>
+              <li><a href="https://blog.maizy.ru/about"><i class="fa fa-bed"></i><span class="icon-label">О блоге</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -75,7 +75,7 @@ blog.maizy.ru            </a>
         <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
 
             <article>
-                <h2><a href="http://blog.maizy.ru/posts/ansible-in-docker">Использование ansible в Docker контейнерах</a></h2>
+                <h2><a href="https://blog.maizy.ru/posts/ansible-in-docker">Использование ansible в Docker контейнерах</a></h2>
                     <div class="article-info">
 <footer class="post-info">
     <div class="published">
@@ -86,11 +86,11 @@ blog.maizy.ru            </a>
 
 <div class="tags">
 <i class="fa fa-tags"></i>&nbsp;
-	<a href="http://blog.maizy.ru/tag/ansible">ansible</a>
+	<a href="https://blog.maizy.ru/tag/ansible">ansible</a>
         /
-	<a href="http://blog.maizy.ru/tag/docker">docker</a>
+	<a href="https://blog.maizy.ru/tag/docker">docker</a>
 </div>
-    
+
 </footer><!-- /.post-info -->                    </div>
                 <div class="summary"><p>Для решения задачи настройки сервера уже давно придумали много вещей лучше, чем просто bash скрипт. Я в частности, использую <a href="http://docs.ansible.com/index.html">ansible</a>. Но для создания docker контейнеров <a href="https://docs.docker.com/reference/builder/">по прежнему предлагается</a> механизм который не далеко ушёл от bash скриптов.</p>
 <p>Мне понадобилось строить на сервере набор контейнеров, причём полностью автоматизировано. Если создание docker images на основе Dockerfile и работа с готовыми контейнерами в ansible решается из коробки, то с настройкой контейнеров через ansible пришлось немного извратиться.</p>
@@ -106,7 +106,7 @@ blog.maizy.ru            </a>
 <p>Плюсы ansible здесь – идемпотентность, готовые модули и возможность использовать некоторые роли, как для хост машин, так и для контейнеров. Например, у меня есть абстрактная роль <code>nginx</code> и отдельная роль поверх неё <code>nginx_container</code> со спецификой для контейнеров.</p>
 <p>То что получилось и подробности работы можно посмотреть в <a href="https://github.com/scala-moscow/deploy">репозитории scala-moscow/deploy</a>.</p>
                 </div>
-                <a class="btn btn-default btn-xs" href="http://blog.maizy.ru/posts/ansible-in-docker#comments">прокомментировать</a>
+                <a class="btn btn-default btn-xs" href="https://blog.maizy.ru/posts/ansible-in-docker#comments">прокомментировать</a>
             </article>
             <hr/>
 
@@ -123,19 +123,19 @@ blog.maizy.ru            </a>
         <div class="col-xs-2">
           <p class="pull-right">
             <i class="fa fa-rss"></i>
-            <a href="http://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
+            <a href="https://blog.maizy.ru/feeds/category/tech/rss.xml">rss</a>
           </p>
         </div>
       </div>
    </div>
 </footer>
-<script src="http://blog.maizy.ru/theme/js/jquery.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/jquery.min.js"></script>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="http://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
 
 <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="http://blog.maizy.ru/theme/js/respond.min.js"></script>
+<script src="https://blog.maizy.ru/theme/js/respond.min.js"></script>
 
     <!-- Disqus -->
     <script type="text/javascript">
