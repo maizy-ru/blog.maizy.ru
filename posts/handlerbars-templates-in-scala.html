@@ -104,7 +104,7 @@ blog.maizy.ru            </a>
         /
 	<a href="https://blog.maizy.ru/tag/scalamoscow">scala.moscow</a>
 </div>
-
+    
 </footer><!-- /.post-info -->                </div>
             </header>
             <div class="entry-content">
@@ -112,7 +112,7 @@ blog.maizy.ru            </a>
 <p>Handlebars мне больше приглянулся. Для scala есть нативная реализация на парсер комбинаторах
 <a href="https://github.com/mwunsch/handlebars.scala">handlebars.scala</a> и её <a href="https://github.com/gilt/handlebars.scala.fork">форк</a>. По фичам scala реализация очень ограничена, в частности, нет встроенной поддержки наследования шаблонов, которая в handlebars делается не силами шаблонизатора, а силами helper'ов. В итоге взял <a href="https://github.com/jknack/handlebars.java">handlebars.java</a>, который выглядит достаточно зрелым и имеет в составе, как минимум, helper'ы <code>partial</code> и <code>block</code> для наследования и i18n.</p>
 <p>После выбора шаблонизатора встал вопрос как в него загружать данные. Встроенные резолверы не удобно использовать в scala, да и хотелось чего-то более простого, чем создания пачки классов-контейнеров для данных. А что есть проще для описания примитивных структур данных, чем JSON. Для scala нашёлся отличный DSL для JSON - <a href="http://json4s.org/">json4s</a>, у которого в частности есть такой лаконичный DSL:</p>
-<div class="highlight"><pre><span class="k">import</span> <span class="nn">org.json4s.JsonDSL._</span>
+<div class="highlight"><pre><span></span><span class="k">import</span> <span class="nn">org.json4s.JsonDSL._</span>
 
 <span class="k">val</span> <span class="n">data</span> <span class="k">=</span>
     <span class="o">(</span><span class="s">&quot;copyright&quot;</span> <span class="o">-&gt;</span>
@@ -175,7 +175,7 @@ blog.maizy.ru            </a>
    <div class="container">
       <hr>
       <div class="row footnotes">
-         <div class="col-xs-10">&copy; 2015-2016 Никита Ковалев
+         <div class="col-xs-10">&copy; 2015-2018 Никита Ковалев
             &middot; Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
             &middot; Theme <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>.         </div>
         <div class="col-xs-2">

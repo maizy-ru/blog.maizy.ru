@@ -90,7 +90,7 @@ blog.maizy.ru            </a>
         /
 	<a href="https://blog.maizy.ru/tag/devops">devops</a>
 </div>
-
+    
 </footer><!-- /.post-info -->                    </div>
                 <div class="summary"><p>Когда начал писать для себя <a href="https://github.com/maizy/akka-cluster-heartbeat">hello world на akka</a> сразу захотелось сделать какой-то артефакт, удобный для жизни в дикой среде production. Хочется, чтобы приложение вело себя как примерный гражданин, умело правильно реагировать на всякие системные сигналы и прочее.</p>
 <p>С упаковкой приложения в jar вместе с scala runtime удалось легко разобраться. Помогут <code>sbt-native-packager</code> и <code>sbt-assembly</code>. Напишу про это позже, когда ещё пойму как правильно результат сложить в .deb пакет.</p>
@@ -98,7 +98,7 @@ blog.maizy.ru            </a>
 <p>Сначала попробовал использовать модный_молодёжный метод <a href="http://www.scala-lang.org/api/current/index.html#scala.sys.package@addShutdownHook(body:=&gt;Unit):scala.sys.ShutdownHookThread">scala.sys.addShutdownHook</a>. Он принимает <code>=&gt; Unit</code> и выполняет его в отдельном треде, когда завершается jvm. Вызов не гарантируется, что в данном случае ок. Плюс метода - переносимость. Минус - код возврата не возможно поставить, метод <code>System.exit()</code> выполняется, но код не ставиться. Экспериментально понял, что на SIGINT код всегда 130, на SIGTERM - 146. Вторая проблема - akka при выключении часть логов пишет в stdout, которые при использовании хука уже не выводятся. Не проверял, но кажется stdout закрывается раньше, чем вызывается этот хук.</p>
 <p>Пришлось взять в руки обработчик сигналов и делать на нём. Он из пакета <code>sun.misc</code>, так что с альтернативными jvm могут быть вопросы, но меня это не волнует в данный момент.</p>
 <p>В итоге метод выглядит примерно так:</p>
-<div class="highlight"><pre><span class="k">import</span> <span class="nn">java.util.concurrent.atomic.AtomicBoolean</span>
+<div class="highlight"><pre><span></span><span class="k">import</span> <span class="nn">java.util.concurrent.atomic.AtomicBoolean</span>
 <span class="k">import</span> <span class="nn">sun.misc.SignalHandler</span>
 <span class="k">import</span> <span class="nn">sun.misc.Signal</span>
 <span class="k">import</span> <span class="nn">scala.concurrent.duration._</span>
@@ -153,7 +153,7 @@ blog.maizy.ru            </a>
    <div class="container">
       <hr>
       <div class="row footnotes">
-         <div class="col-xs-10">&copy; 2015-2016 Никита Ковалев
+         <div class="col-xs-10">&copy; 2015-2018 Никита Ковалев
             &middot; Powered by <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>
             &middot; Theme <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>.         </div>
         <div class="col-xs-2">
