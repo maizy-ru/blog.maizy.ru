@@ -74,6 +74,363 @@ blog.maizy.ru            </a>
         <div class="col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-8 col-lg-offset-2">
 
             <article>
+                <h2><a href="https://blog.maizy.ru/posts/scala-cats-summary">Конспект по Scala with Cats</a></h2>
+                    <div class="article-info">
+<footer class="post-info">
+    <div class="published">
+        <time datetime="2018-12-21T00:00:00+03:00"> 21.12.2018</time>
+    </div>
+
+
+
+<div class="tags">
+<i class="fa fa-tags"></i>&nbsp;
+	<a href="https://blog.maizy.ru/tag/cats">cats</a>
+        /
+	<a href="https://blog.maizy.ru/tag/scala">scala</a>
+</div>
+    
+</footer><!-- /.post-info -->                    </div>
+                <div class="summary"><p>Scala with Cats – это <a href="https://underscore.io/books/scala-with-cats/">свободно доступная книга</a>, написанная Noel Welsh и Dave Gurnell из Underscore. Охватывает все основы использования библиотеки <a href="https://typelevel.org/cats/">cats</a>.</p>
+<p>Книгу рекомендую читать с выполнением заданий, без этого лично мне полного понимания достичь не удалось.</p>
+<p>Ниже краткий насколько возможно конспект по Type Class'ам из книги.</p>
+<h3>Show</h3>
+<ul>
+<li>вывести на печать любой тип</li>
+<li>syntax: <code>.show</code></li>
+</ul>
+<h3>Eq</h3>
+<ul>
+<li>типобезопасное сравнение</li>
+<li>syntax:<ul>
+<li><code>a === b</code></li>
+<li><code>a =!= b</code></li>
+</ul>
+</li>
+</ul>
+<h3>Monoid</h3>
+<ul>
+<li>операции<ul>
+<li><code>.combine(a1, a2)</code></li>
+<li><code>.empty[A]</code></li>
+</ul>
+</li>
+<li>законы:<ul>
+<li>combine ассоциативный</li>
+<li>empty должен быть нейтральным элементом (identity element)</li>
+</ul>
+</li>
+</ul>
+<h3>Semigroup</h3>
+<ul>
+<li>объединение двух значений</li>
+<li>только combine из Monoid</li>
+<li>там где требуется Semigroup, всегда можно использовать Monoid</li>
+<li>нужен так как не всегда существует нейтральный элемент, пример – NonEmptyList</li>
+<li>syntax: <code>a |+| b</code></li>
+</ul>
+<h3>Functor</h3>
+<ul>
+<li>что-то у чего есть <code>map</code></li>
+<li>не стоит думать об этом только, как о проходе по списку, это может быть и работа с внутренним состоянием "контейнера" (в контексте этого "контейнера"), без извлечения значения из "контейнера".</li>
+<li>операции:<ul>
+<li><code>.lift(f)</code></li>
+</ul>
+</li>
+<li>syntax:<ul>
+<li><code>f.map(g)</code></li>
+</ul>
+</li>
+</ul>
+<h3>Contravariant (Functor)</h3>
+<ul>
+<li>из <code>F[B]</code> имея <code>A =&gt; B</code> получить <code>F[A]</code></li>
+<li>syntax: <code>.contramap(f)</code></li>
+</ul>
+<h3>Invariant</h3>
+<ul>
+<li>имея <code>A =&gt; B</code>, <code>B =&gt; A</code> и <code>Monoid[B]</code> получить <code>Monoid[A]</code></li>
+<li>syntax: <code>Monoid[B].imap(f)(g)</code></li>
+</ul>
+<h3>Monad</h3>
+<ul>
+<li>1000 разных подходов к определению, в книге такое: монада – механизм для последовательных вычислений</li>
+<li>операции<ul>
+<li><code>.pure(a)</code> – создание монадического контекста из сырого значения</li>
+<li><code>.flatMap(f)</code> – извлечение значения из контекста и создание следующего контекста в последовательности</li>
+</ul>
+</li>
+<li>любая монада – функтор, map легко построить из pure+flatMap</li>
+<li>laws:<ul>
+<li>левоассоциативность: <code>pure(a).flatMap(f) == f(a)</code>. тут важно помнить об эффектах. именно по этой причине Try не Monad, так как если "снять" с него контекст монады при обычном вызове получим эффект – исключение, а если не снять то получим Failure.</li>
+<li>правоассоциативность: <code>m.flatMap(pure) == m</code>.</li>
+<li>ассоциативность: <code>m.flatMap(f).flatMap(g) == m.flatMap(x =&gt; f(x).flatMap(g))</code></li>
+</ul>
+</li>
+<li>syntax:<ul>
+<li><code>.pure[T]</code> (из cats.syntax.applicative)</li>
+<li><code>.map(f)</code> (из cats.syntax.functor)</li>
+<li><code>.flatMap(f)</code> (из cats.syntax.flatMap)</li>
+<li>можно использовать for comprehensions из scala</li>
+</ul>
+</li>
+<li>при определении своих монад<ul>
+<li><code>.flatMap</code></li>
+<li><code>.pure</code></li>
+<li><code>.tailRecM</code> – оптимизация для вложенных .flatMap вызовов. метод можно делать <code>@tailrec</code></li>
+</ul>
+</li>
+</ul>
+<h3>Id</h3>
+<ul>
+<li>Identity Monad</li>
+<li>позволяет использовать в коде, где ожидаются монады немонадные значения</li>
+<li>мощный инструмент для тестов кода построенного на монадах</li>
+<li>например<ul>
+<li><code>123 : Id[Int]</code></li>
+<li><code>"abc" : Id[String]</code></li>
+</ul>
+</li>
+</ul>
+<h3>Either</h3>
+<ul>
+<li>обычный тип из scala</li>
+<li>операции:<ul>
+<li><code>.orElse(Either)</code></li>
+<li><code>.ensure(e)(predicate)</code></li>
+<li><code>.recover(partialFunction)</code></li>
+<li><code>.recoverWith(partialFunction)</code></li>
+<li><code>.leftMap(f)</code></li>
+<li><code>.bimap(f, g)</code></li>
+<li><code>.swap</code></li>
+</ul>
+</li>
+<li>syntax:<ul>
+<li>right bias (flatMap/map/filter работающие на правой части Either, есть из коробки в scala 2.12+)</li>
+<li><code>a.asRight</code></li>
+<li><code>a.asLeft</code></li>
+</ul>
+</li>
+</ul>
+<h3>MonadError</h3>
+<ul>
+<li>абстракция поверх Either для работы с ошибками</li>
+<li>параметризирован типом монады и типом ошибки</li>
+<li>операции<ul>
+<li><code>.raiseError(e)</code></li>
+<li><code>.handleError(a)(f)</code></li>
+<li><code>.ensure(a)(e)(predicate)</code></li>
+</ul>
+</li>
+<li>syntax<ul>
+<li><code>.ensure(e)(predicate)</code></li>
+</ul>
+</li>
+</ul>
+<h3>Eval</h3>
+<ul>
+<li>абстракция над выполнением</li>
+<li>в частности: позволяет делать стекобезопасные рекурсивные вычисления</li>
+<li>операции<ul>
+<li><code>.now(f)</code></li>
+<li><code>.later(f)</code></li>
+<li><code>.always(f)</code></li>
+<li><code>.memoize</code></li>
+<li><code>.defer(=&gt; Eval)</code></li>
+</ul>
+</li>
+</ul>
+<h3>Writer</h3>
+<ul>
+<li>сбор лога при вычислении</li>
+<li>операции<ul>
+<li><code>val (log, result) = writer.run</code></li>
+<li><code>.mapWritten(f)</code></li>
+<li><code>.bimap(f, g)</code></li>
+<li><code>.mapBoth( (log, res) =&gt; ...)</code></li>
+<li><code>.reset</code></li>
+<li><code>.swap</code></li>
+</ul>
+</li>
+<li>syntax:<ul>
+<li><code>a.pure[T]</code> (требует Monoid[T] в implicit scope)</li>
+<li><code>a.tell</code></li>
+<li><code>a.writer(seq)</code></li>
+</ul>
+</li>
+</ul>
+<h3>Reader</h3>
+<ul>
+<li>построение цепочки операций на основе входных параметров</li>
+<li>ex: DI, encoders</li>
+<li>операции:<ul>
+<li><code>.flatMap</code> – позволяет объединить несколько reader от одного входного значения</li>
+<li><code>.map</code></li>
+</ul>
+</li>
+</ul>
+<h3>State</h3>
+<ul>
+<li>передача дополнительного состояния в вычисления</li>
+<li>моделирование мутабельного состояния в pure functional подходе</li>
+<li><code>State[S, A]</code> это <code>S =&gt; (S, A)</code></li>
+<li>операции<ul>
+<li><code>val (state, res) = a.run(v).value</code></li>
+<li><code>a.runS(v).value</code></li>
+<li><code>a.runA(v).value</code></li>
+</ul>
+</li>
+<li>стандартные преобразования<ul>
+<li><code>State.get</code></li>
+<li><code>State.set</code></li>
+<li><code>State.pure</code></li>
+<li><code>State.inspect</code></li>
+<li><code>State.modify</code></li>
+</ul>
+</li>
+<li>синтаксис<ul>
+<li>for comprehension</li>
+</ul>
+</li>
+</ul>
+<h3>Monad transformers</h3>
+<ul>
+<li>позволяют комбинировать монады</li>
+<li>комбинация невозможна без знаний об одной из двух монад</li>
+<li>например, EitherT позволяет комбинировать любую монаду с Either</li>
+<li>из коробки: <code>cats.data.{OptionT, EitherT, ReaderT, WriterT, StateT, IdT}</code></li>
+<li>соглашение: трансформер определяет внутреннюю монаду, а первый его тип - внешнюю. например, <code>OptionT[List, A]</code> – создаст монаду для <code>List[Option[A]]</code></li>
+<li>syntax:<ul>
+<li>если нужно часто определять alias для типов в стеках монад, поможет scala compiler plugin king projector. с ним можно писать так: <code>123.pure[EitherT[Option, String, ?]]</code></li>
+<li><code>.pure</code></li>
+<li><code>.value</code></li>
+</ul>
+</li>
+<li>использование для реализации:<ul>
+<li>многие монады реализованы через трансформеры</li>
+<li><code>type ReaderT[F[_], A, B] = Kleisli[F, A, B]</code></li>
+<li><code>type Writer[W, A] = WriterT[Id, W, A]</code></li>
+</ul>
+</li>
+</ul>
+<h3>Kleisli</h3>
+<ul>
+<li>объединение функций <code>A =&gt; F[B]</code>, <code>B =&gt; F[C]</code> в <code>A =&gt; F[C]</code></li>
+</ul>
+<h3>Semigroupal</h3>
+<ul>
+<li>объединяет два контекста</li>
+<li>в литературе иногда называют Monoidal</li>
+<li>операции:<ul>
+<li><code>.map2</code> ... <code>.map22</code></li>
+<li><code>.tuple2</code> ... <code>.tuple22</code></li>
+<li><code>.contramap2</code> ... <code>.contramap22</code></li>
+<li><code>.imap2</code> ... <code>.imap22</code></li>
+</ul>
+</li>
+<li>syntax<ul>
+<li><code>(a, b, c, ...).tupled</code></li>
+<li><code>(a, b, c ...).mapN</code></li>
+<li><code>(Monoid[A], Monoid[B], ...).imapN(toF)(fromF)</code></li>
+</ul>
+</li>
+<li>Intellij Idea не понимает тип выражения после mapN, это <a href="https://youtrack.jetbrains.com/issue/SCL-12892">недавно поправили</a></li>
+<li>Иногда получаемый результат не сразу очевиден. Например Semigroupal от двух списков будет прямое произведение (каждый с каждым), а не zip списков.</li>
+</ul>
+<h3>Validated</h3>
+<ul>
+<li>аналог Either, но с накоплением всех ошибок</li>
+<li>требует Semigroup для типа ошибки</li>
+<li>операции<ul>
+<li><code>Validated.valid[E, A](a)</code></li>
+<li><code>Validated.invalid[E, A](e)</code></li>
+<li><code>Validated.catchOnly[Throwable](f)</code></li>
+<li><code>Validated.catchNonFatal(f)</code></li>
+<li><code>Validated.fromTry(a)</code></li>
+<li><code>Validated.fromEither[E, A](a)</code></li>
+<li><code>Validated.fromOption[E, A](a, e)</code></li>
+<li><code>.map(f)</code></li>
+<li><code>.leftMap(f)</code></li>
+<li><code>.bimap(f, g)</code></li>
+<li><code>.toEither</code></li>
+<li><code>.withEither(f)</code></li>
+<li><code>.withValidated(f)</code></li>
+<li><code>.getOrElse(a)</code></li>
+<li><code>.fold(f, g)</code></li>
+</ul>
+</li>
+<li>syntax<ul>
+<li><code>a.valid[E]</code></li>
+<li><code>a.invalid[A]</code></li>
+<li><code>.pure[Validated[F[E], A]]</code></li>
+<li><code>.raiseError[Validated[F[E], A], E]</code></li>
+<li><code>.tupled</code></li>
+</ul>
+</li>
+</ul>
+<h3>Apply</h3>
+<ul>
+<li>Semigroupal + Functor</li>
+<li>альтернативный к Semigroupal способ закодировать объединение контекстов</li>
+<li>операции<ul>
+<li><code>.ap(f)(a)</code></li>
+<li><code>.product(a, b)</code></li>
+</ul>
+</li>
+</ul>
+<h3>Applicative</h3>
+<ul>
+<li>Apply + pure, который позволяет создать новый Applicative instance из сырого значения</li>
+<li>Monad = Applicative + FlatMap</li>
+<li>операции<ul>
+<li><code>.pure(a)</code></li>
+</ul>
+</li>
+</ul>
+<h3>NonEmpty*</h3>
+<ul>
+<li>аналоги стандартных коллекций, но имеющие строго один или более элементов</li>
+<li><code>NonEmptyList</code></li>
+<li><code>NonEmptyVector</code></li>
+</ul>
+<h3>Foldable</h3>
+<ul>
+<li>абстракция для foldLeft / foldRight</li>
+<li>операции<ul>
+<li><code>.foldLeft(a, i)(f)</code></li>
+<li><code>.foldRight(a, i: Eval[B])(f): Eval[B]</code> (stack safe)</li>
+<li>привычные методы коллекций, поверх foldLeft: <code>.find</code>, <code>.exists</code>, <code>.forall</code>, <code>.toList</code>, <code>.isEmpty</code>, <code>.nonEmpty</code> ...</li>
+<li><code>.combineAll(a)</code> (aka <code>.fold</code>, требует Monoid)</li>
+<li><code>.foldMap(a)(f)</code> (требует Monoid)</li>
+<li><code>.compose(other)</code></li>
+</ul>
+</li>
+<li>syntax:<ul>
+<li>все операции доступны как синтаксис</li>
+<li><code>a.foldLeft(i)(f)</code> и т. д.</li>
+</ul>
+</li>
+</ul>
+<h3>Traverse</h3>
+<ul>
+<li>имея набор из F[A], получить F от набора А</li>
+<li>например, <code>List[Future[A]]</code> → <code>Future[List[A]]</code></li>
+<li>операции<ul>
+<li><code>.traverse(a)(f)</code></li>
+<li><code>.sequence(a)</code></li>
+</ul>
+</li>
+<li>syntax:<ul>
+<li><code>a.traverse(f)</code></li>
+<li><code>a.sequence</code></li>
+</ul>
+</li>
+</ul>
+                </div>
+                <a class="btn btn-default btn-xs" href="https://blog.maizy.ru/posts/scala-cats-summary#comments">прокомментировать</a>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="https://blog.maizy.ru/posts/video-jan-oct-2016">Обзоры видео на технические темы, январь-сентябрь 2016</a></h2>
                     <div class="article-info">
 <footer class="post-info">
