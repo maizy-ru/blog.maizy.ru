@@ -90,7 +90,7 @@ blog.maizy.ru            </a>
         /
 	<a href="https://blog.maizy.ru/tag/scala">scala</a>
 </div>
-    
+
 </footer><!-- /.post-info -->                    </div>
                 <div class="summary"><p>Продолжая заниматься <a href="https://github.com/maizy/akka-cluster-heartbeat">hello world'ом на akka</a> погрузился в вопрос тестирования акторов.</p>
 <p>Общие вещи просты, не вижу смысла пересказывать <a href="http://doc.akka.io/docs/akka/2.3.14/scala/testing.html">документацию</a>, остановлюсь только на ключевых моментах и выводах.</p>
@@ -190,7 +190,7 @@ blog.maizy.ru            </a>
 <h3>Вывод</h3>
 <p>Тестировать akka, даже в сложных конфигурациях можно и нужно, но tooling ещё требует доработки.</p>
                 </div>
-                <a class="btn btn-default btn-xs" href="https://blog.maizy.ru/posts/akka-cluster-testing#comments">прокомментировать</a>
+
             </article>
             <hr/>
             <article>
@@ -209,7 +209,7 @@ blog.maizy.ru            </a>
         /
 	<a href="https://blog.maizy.ru/tag/devops">devops</a>
 </div>
-    
+
 </footer><!-- /.post-info -->                    </div>
                 <div class="summary"><p>Когда начал писать для себя <a href="https://github.com/maizy/akka-cluster-heartbeat">hello world на akka</a> сразу захотелось сделать какой-то артефакт, удобный для жизни в дикой среде production. Хочется, чтобы приложение вело себя как примерный гражданин, умело правильно реагировать на всякие системные сигналы и прочее.</p>
 <p>С упаковкой приложения в jar вместе с scala runtime удалось легко разобраться. Помогут <code>sbt-native-packager</code> и <code>sbt-assembly</code>. Напишу про это позже, когда ещё пойму как правильно результат сложить в .deb пакет.</p>
@@ -261,7 +261,7 @@ blog.maizy.ru            </a>
 
 <p>Теперь и сигналы честно обрабатываются, и коды возвратов правильные, и все выходы из приложения сводятся в хук для akka.</p>
                 </div>
-                <a class="btn btn-default btn-xs" href="https://blog.maizy.ru/posts/akka-graceful-shutdown#comments">прокомментировать</a>
+
             </article>
             <hr/>
             <article>
@@ -278,7 +278,7 @@ blog.maizy.ru            </a>
 <i class="fa fa-tags"></i>&nbsp;
 	<a href="https://blog.maizy.ru/tag/akka">akka</a>
 </div>
-    
+
 </footer><!-- /.post-info -->                    </div>
                 <div class="summary"><p>Буду делать небольшие заметки на полях по результатам изучения akka.</p>
 <p>Akka – это система акторов на jvm, реализованная на scala. Можно использовать и из java. Про саму концепцию акторов можно почитать в <a href="https://ru.wikipedia.org/wiki/Модель_акторов">интернетах</a>, здесь я буду останавливаться на особенностях akka.</p>
@@ -313,7 +313,7 @@ blog.maizy.ru            </a>
 <p>Нет встроенного механизма сказать кластеру "я запустился", у ноды при старте должен быть список seed нод, хотя бы одна из которых должна работать. Seed нодой может быть любая нода работающего кластера. Т.е. в реальной жизни тут нужно будет брать какие-то решения для discovery. Как вариант предлагают также держать ноды, которые ничего не делают (не запускают пользовательские акторы), а только используются как seed ноды.</p>
 <p>Пока всё. Некоторые из аспектов описанных выше я буду изучать подробнее и ещё про них напишу. Если найдёте в моих записях ошибки, буду раз замечаниям.</p>
                 </div>
-                <a class="btn btn-default btn-xs" href="https://blog.maizy.ru/posts/akka-remote-n-cluster#comments">прокомментировать</a>
+
             </article>
             <hr/>
 
@@ -336,29 +336,9 @@ blog.maizy.ru            </a>
       </div>
    </div>
 </footer>
-<script src="https://blog.maizy.ru/theme/js/jquery.min.js"></script>
 
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="https://blog.maizy.ru/theme/js/bootstrap.min.js"></script>
 
-<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="https://blog.maizy.ru/theme/js/respond.min.js"></script>
 
-    <!-- Disqus -->
-    <script type="text/javascript">
-        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-        var disqus_shortname = 'blogmaizyru'; // required: replace example with your forum shortname
-
-        /* * * DON'T EDIT BELOW THIS LINE * * */
-        (function () {
-            var s = document.createElement('script');
-            s.async = true;
-            s.type = 'text/javascript';
-            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-        }());
-    </script>
-    <!-- End Disqus Code -->
     <!-- Google Analytics Universal -->
     <script type="text/javascript">
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
